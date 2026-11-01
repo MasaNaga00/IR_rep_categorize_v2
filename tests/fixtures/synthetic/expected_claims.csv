@@ -1,0 +1,52 @@
+﻿repair_id,sub_id,user_code,reproduction,basis,ref_sub_id,repair_code,needs_internal_comment,note
+T001,1,M001,reproduced,direct,,M001,,
+T002,1,M022,not_reproduced,direct,,,,
+T003,1,M005,reproduced,direct,,M005,,
+T003,2,M017,reproduced,direct,,M017,,
+T004,1,M001,reproduced,direct,,M001,,
+T004,2,M017,reproduced,direct,,M017,,
+T005,1,M001,reproduced,direct,,M001,,
+T005,2,M017,reproduced,same_cause,1,M017,,
+T006,1,M005,reproduced,direct,,M005,,
+T006,2,M009,reproduced,same_cause,1,M009,,
+T007,1,M001,reproduced,direct,,M001,,①②③まとめ書き。T004 と同じ扱い
+T007,2,M010,reproduced,direct,,M010,,
+T007,3,M004,reproduced,direct,,M004,,
+T008,1,M007,reproduced,direct,,M007,,
+T008,2,NO_CLAIM,not_mentioned,none,,,,
+T008,3,M026,reproduced,direct,,M026,,
+T009,1,M001,reproduced,direct,,M001,,
+T010,1,M005,reproduced,direct,,M005,,
+T011,1,M004,reproduced,direct,,M004,,
+T012,1,M017,reproduced,direct,,M017,,
+T013,1,M005,reproduced,direct,,M045,,T003・T034 の付随のファーム更新と区別する
+T014,1,M043,request_only,direct,,M043,,ユーザ視点コードもクリーニング(依頼内容)とする
+T015,1,M020,out_of_scope,direct,,M047,,
+T015,2,M001,reproduced,direct,,M021,,
+T016,1,M007,reproduced,direct,,M007,,
+T016,2,M016,reproduced,direct,,M016,,
+T017,1,M010,not_reproduced,direct,,,,
+T018,1,M005,not_reproduced,direct,,,,②の repair_code は同原因ルールで②自身のユーザ視点コードになるが、確認できていないので集計対象外
+T018,2,M005,not_reproduced,same_cause,1,M005,,
+T019,1,M001,partial,direct,,M001,,
+T020,1,M005,reproduced,direct,,M005,,
+T020,2,M017,not_mentioned,none,,,,
+T021,1,M_UNK,request_only,direct,,M042,,
+T022,1,L001,reproduced,direct,,L001,,
+T022,2,L031,reproduced,direct,,L031,,
+T023,1,M001,reproduced,direct,,M001,,abnormal_use が false でも always_user_caused でユーザ起因
+T024,1,M008,reproduced,direct,,M013,,
+T025,1,M001,reproduced,direct,,M001,,
+T025,2,M017,reproduced,same_cause,1,M017,,
+T025,3,M016,reproduced,same_cause,2,M016,,
+T028,1,M005,reproduced,direct,,M005,1,内部コメントを使うと判断が変わり得る例
+T029,1,L008,reproduced,direct,,L008,,
+T030,1,M007,reproduced,direct,,M007,,
+T030,2,M017,reproduced,direct,,M017,,
+T031,1,M022,reproduced,direct,,M022,,
+T031,2,M023,reproduced,direct,,M023,,
+T032,1,M022,reproduced,direct,,M022,,②のユーザ視点コードはオーバーホール(依頼内容)とした
+T032,2,M044,not_reproduced,direct,,,,
+T033,1,M024,reproduced,direct,,M024,,
+T034,1,M007,reproduced,direct,,M007,,修理者視点を M045 にすると誤って NO になる
+T035,1,M010,not_reproduced,direct,,,,

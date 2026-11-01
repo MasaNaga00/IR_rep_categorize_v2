@@ -1,0 +1,8 @@
+# 入力 CSV の列の対応づけ(要件定義書 R-24)
+# 左: プログラム内部の名前(変更しない) / 右: 入力 CSV の列名(実データに合わせて変更する)
+repair_id: ID
+product_type: 事業コード
+user_comment: user_comment
+repair_comment: repair_comment
+internal_1: Internal_1
+internal_2: Internal_2

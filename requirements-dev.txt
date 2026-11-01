@@ -1,0 +1,4 @@
+# v2 のテストに必要なライブラリ(R-11)。テストは python -m pytest tests/v2 で実行する。
+-r requirements.txt
+pytest>=8.0
+requests-mock>=1.11
