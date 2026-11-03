@@ -26,7 +26,7 @@ def _write_variant(tmp_path: Path, mutate) -> Path:
 def test_r21_basic_attributes(codebook):
     assert codebook.version == "0.3.0-test"
     assert len(codebook.sha256) == 64
-    assert codebook.product_ids() == ["ML", "LENS", "STB"]
+    assert codebook.product_ids() == ["ML", "LENS", "DC", "STB"]
     assert codebook.product_name("ML") == "ミラーレスカメラ"
 
 
@@ -134,6 +134,37 @@ def test_r16_check_codebook_cli_ng(tmp_path, capsys):
 def test_r14_repository_default_codebook_is_valid():
     """リポジトリ同梱の初期値 YAML が v2 の自動チェックを通ること(R-14、R-16)。"""
     cb = load_codebook(REPO_ROOT / "config" / "classification_codes.yaml")
-    assert cb.version == "0.3.0"
+    assert cb.version == "0.4.1"
     assert set(cb.product_ids()) >= {"ML", "LENS"}
     assert cb.code_by_role("ML", "connected_device") == "M047"
+
+
+def test_r21_setting_caused_code_is_not_manufacturer():
+    """2026-11-03 追加: 設定・操作起因(M048 / L038)はメーカー責任ではない。"""
+    cb = load_codebook(REPO_ROOT / "config" / "classification_codes.yaml")
+    assert cb.code("ML", "M048").name == "設定・操作起因"
+    assert not cb.is_manufacturer("ML", "M048")
+    assert not cb.is_manufacturer("LENS", "L038")
+
+
+def test_r21_lens_surface_vs_inside():
+    """2026-11-03 追加: レンズ表面(L039)はユーザ責任、レンズ内(L028)はメーカー責任。"""
+    cb = load_codebook(REPO_ROOT / "config" / "classification_codes.yaml")
+    assert not cb.is_manufacturer("LENS", "L039")
+    assert cb.is_manufacturer("LENS", "L028")
+    assert "L039" in cb.code("LENS", "L028").description
+
+
+def test_r15_compact_camera_product():
+    """2026-11-03 追加: 製品 DC(コンパクトカメラ、接頭文字 D)。"""
+    cb = load_codebook(REPO_ROOT / "config" / "classification_codes.yaml")
+    assert cb.product_name("DC") == "コンパクトカメラ"
+    assert len(cb.codes("DC")) == 48
+    assert cb.code_by_role("DC", "connected_device") == "D046"
+    assert cb.code_by_role("DC", "other") == "D048"
+    assert cb.code_by_role("DC", "unknown") == "D_UNK"
+    assert cb.is_manufacturer("DC", "D009") and not cb.is_manufacturer("DC", "D010")
+    # 2026-11-03: コンパクトはセンサーにユーザが触れられないため、センサー内ゴミ D017 を削除し、センサーゴミ D018 をメーカー責任に
+    assert cb.code("DC", "D017") is None
+    assert cb.is_manufacturer("DC", "D018")
+    assert {c for c in cb.codes("DC") if cb.is_service("DC", c)} == {"D042", "D043", "D044", "D045"}

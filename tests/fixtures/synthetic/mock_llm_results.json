@@ -787,5 +787,175 @@
   ],
   "environment": [],
   "extra_findings": []
+ },
+ "T036": {
+  "repair_id": "T036",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "連写するとすぐに止まってしまい、撮れる枚数が少ない。",
+    "user_code": "M003",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M048",
+    "repair_excerpt": "連続撮影時の撮影枚数制限が設定されていたことにより、ご指摘の現象が発生することを確認しました。設定を解除後動作点検いたしましたが、異常はございませんでした。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T037": {
+  "repair_id": "T037",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "液晶モニターが真っ黒で何も映らない。",
+    "user_code": "M017",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M048",
+    "repair_excerpt": "画面の表示先設定がファインダー固定になっていたことにより、ご指摘の現象が発生していることを確認しました。設定を解除後動作点検いたしましたが、異常はございませんでした。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T038": {
+  "repair_id": "T038",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "撮影していると、エラーが表示されて撮影できなくなる。",
+    "user_code": "M002",
+    "reproduction": "not_reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": null,
+    "repair_excerpt": ""
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T039": {
+  "repair_id": "T039",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "エラー30が頻繁に出る。",
+    "user_code": "M002",
+    "reproduction": "not_reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": null,
+    "repair_excerpt": ""
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T040": {
+  "repair_id": "T040",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "撮影した画像に横線が入ることがある。画像を添付します。",
+    "user_code": "M008",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M008",
+    "repair_excerpt": "お預かりした画像データでご指摘の現象を確認しました。現品では再現しませんでしたが、撮像センサーユニットの不具合が想定されるため、撮像センサーユニットを交換いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T041": {
+  "repair_id": "T041",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "フロントレンズに引っかいたような傷が数か所ある。",
+    "user_code": "L039",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "L039",
+    "repair_excerpt": "前玉表面を点検いたしましたところ、傷ではなく汚れであることを確認したため、表面を清掃いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T042": {
+  "repair_id": "T042",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "レンズの中にゴミが見える。",
+    "user_code": "L028",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "L028",
+    "repair_excerpt": "分解点検いたしましたところ、レンズ内部にゴミの混入を確認したため、分解清掃を実施いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T043": {
+  "repair_id": "T043",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "レンズにゴミが付いている。",
+    "user_code": "L039",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "L039",
+    "repair_excerpt": "レンズのゴミを清掃いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T044": {
+  "repair_id": "T044",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "電源ボタンを押しても電源が入らない。",
+    "user_code": "D001",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "D001",
+    "repair_excerpt": "電源基板の不具合により、ご指摘の現象が発生していたため、電源基板を交換しました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T045": {
+  "repair_id": "T045",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "写真が白っぽくかすむ。",
+    "user_code": "D020",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "D010",
+    "repair_excerpt": "レンズ表面に汚れの付着を確認しました。表面を清掃いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
  }
 }

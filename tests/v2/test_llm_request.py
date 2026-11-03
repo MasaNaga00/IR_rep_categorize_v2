@@ -22,8 +22,9 @@ def test_r29_batches_are_per_product_and_sized(codebook, synth_csv):
     assert sorted(all_ids) == sorted(r["repair_id"] for r in recs)
     assert [b.batch_id for b in batches] == list(range(1, len(batches) + 1))
     ml = [b for b in batches if b.product_id == "ML"]
-    assert [len(b.repair_ids) for b in ml] == [10, 10, 10, 1]  # ML 31 件
-    assert [len(b.repair_ids) for b in batches if b.product_id == "LENS"] == [2]
+    assert [len(b.repair_ids) for b in ml] == [10, 10, 10, 6]  # ML 36 件
+    assert [len(b.repair_ids) for b in batches if b.product_id == "LENS"] == [5]
+    assert [len(b.repair_ids) for b in batches if b.product_id == "DC"] == [2]
 
 
 def test_r30_inputs(codebook, synth_csv):

@@ -8,7 +8,7 @@
 # =============================================================================
 
 meta:
-  version: "0.3.0"
+  version: "0.4.1"
   source: "故障分類.csv"
   created_at: "2026-04-29"
   total_codes:
@@ -22,6 +22,26 @@ meta:
     - 製品種別（ML/LENS）はSQL段階で判定済みの前提。
     - v0.2.0: ユーザ視点/修理者視点の2軸分類、reproduction_status属性を追加。
   changelog:
+    - version: "0.4.1"
+      date: "2026-11-03"
+      changes:
+        - "DC: センサー内ゴミ D017 を削除(欠番)し、センサーゴミ D018 をメーカー責任に変更(コンパクトカメラはユーザがセンサーに触れられないため)"
+    - version: "0.4.0"
+      date: "2026-11-03"
+      changes:
+        - "製品 DC(コンパクトカメラ、接頭文字 D)を追加。49分類(D001〜D048、D_UNK)。分類名・責任区分・記録区分はユーザ提供の一覧、説明文は AI の下書き"
+    - version: "0.3.3"
+      date: "2026-11-03"
+      changes:
+        - "レンズ表面:ゴミ/汚れ/キズ L039 を追加(前玉・後玉の表面。ユーザ責任)。L028(レンズ内)との判定ルールを追加。迷ったら L039"
+    - version: "0.3.2"
+      date: "2026-11-03"
+      changes:
+        - "claim_reproduction_statuses の説明を追記: 現象を確認できない場合はエラー履歴・推定交換があっても再現せず。ユーザ提出の証左で確認できた場合は再現"
+    - version: "0.3.1"
+      date: "2026-11-03"
+      changes:
+        - "設定・操作起因 M048 / L038 を追加(カメラ・レンズの設定が原因で本体に異常がない修理。メーカー責任ではない)"
     - version: "0.3.0"
       date: "2026-11-02"
       changes:
@@ -404,6 +424,13 @@ product_categories:
         responsibility: "user_or_unknown"
         description_status: "verified"
 
+      M048:
+        name: "設定・操作起因"
+        description: "カメラの設定や操作方法が原因で現象が発生しており、本体に異常がないもの。設定の解除・変更や操作の説明で解消した修理データ。部品の不具合が見つかった場合はこのコードにしない。"
+        record_type: "failure"
+        responsibility: "user_or_unknown"
+        description_status: "verified"
+
       # --- その他/特殊コード ---
       M046:
         name: "その他"
@@ -622,10 +649,11 @@ product_categories:
 
       L028:
         name: "レンズ内：ゴミ/キズ/汚れ"
-        description: "レンズ内部（光学系内部）のゴミ・キズ・汚れの混入。製造・組立由来の場合が多い。"
+        description: "レンズ内部（光学系内部）のゴミ・キズ・汚れの混入。製造・組立由来の場合が多い。分解しないと除去・確認できない内部のものに限る。前玉・後玉の表面に付いたゴミ・汚れ・キズは L039。内部か表面か判断できない場合は L039。"
         record_type: "failure"
         responsibility: "manufacturer"
-        description_status: "ai_inferred"
+        description_status: "verified"
+        decision_rule: "明らかにレンズ内部(分解が必要)と判断できる場合のみL028、それ以外はL039"
 
       L029:
         name: "コーティング剥がれ"
@@ -691,6 +719,21 @@ product_categories:
         responsibility: "user_or_unknown"
         description_status: "verified"
 
+      L038:
+        name: "設定・操作起因"
+        description: "レンズのスイッチ設定(AF/MF、手ブレ補正など)やカメラ側の設定、操作方法が原因で現象が発生しており、レンズに異常がないもの。部品の不具合が見つかった場合はこのコードにしない。"
+        record_type: "failure"
+        responsibility: "user_or_unknown"
+        description_status: "verified"
+
+      L039:
+        name: "レンズ表面：ゴミ/汚れ/キズ"
+        description: "前玉・後玉など、レンズの外側の表面に付着したゴミ・汚れ・指紋等、および表面のキズ。ユーザの使用環境で付いた可能性が高く、メーカー責任の範囲外とみなす。分解が必要なレンズ内部のゴミ・キズ・汚れは L028。内部か表面か判断できない場合もこちら。"
+        record_type: "failure"
+        responsibility: "user_or_unknown"
+        description_status: "verified"
+        decision_rule: "前玉・後玉の表面のもの、または内部か表面か判断できないものはL039"
+
       # --- その他/特殊コード ---
       L036:
         name: "その他"
@@ -709,6 +752,360 @@ product_categories:
         responsibility: "user_or_unknown"
         is_special: true
         description_status: "verified"
+
+  # ===========================================================================
+  # DC(コンパクトカメラ) 2026-11-03 追加。分類名・責任区分・記録区分はユーザ提供の一覧による。
+  # 説明文は AI の下書き(description_status: ai_inferred)。
+  # ===========================================================================
+  DC:
+    name: "コンパクトカメラ"
+    code_prefix: "D"
+    failure_categories:
+
+      D001:
+        name: "電源不良"
+        description: "電源が入らない、起動しない等、電源系統全般の不具合。使用中にフリーズする・電源が切れるものは D003、電源ボタン自体の操作不良は D021、充電できないものは D002。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D002:
+        name: "充電不良"
+        description: "本体やUSB経由でバッテリーが充電できない、充電が途中で止まる等の充電系統の不具合。USBの通信・接続の不具合は D040。充電器側の不良は D046。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D003:
+        name: "使用中、フリーズ/電源切れ"
+        description: "使用中に操作を受け付けなくなる(フリーズ)、または使用中に勝手に電源が切れる不具合。最初から電源が入らないものは D001。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D004:
+        name: "エラー"
+        description: "操作中にエラーメッセージ・エラーコードが表示される、エラーで停止する。具体的な機能不良が特定できない場合のエラー表示も含む。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D005:
+        name: "動作不良"
+        description: "特定の機能・操作が正常に動作しない包括的な分類。他の具体的な分類に該当しない動作異常。設定や操作が原因のものは D047。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D006:
+        name: "LCD表示不具合"
+        description: "背面液晶(LCD)の表示異常(表示されない、ノイズ、輝度・色の異常、ドット抜け、画面割れ等)。タッチ操作の不良は D007。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D007:
+        name: "タッチパネル不具合"
+        description: "タッチ操作の反応不良、誤反応、無反応、タッチ位置のずれ等。表示の異常は D006。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D008:
+        name: "EVF表示不具合"
+        description: "電子ビューファインダー(EVF)の表示異常(表示されない、ノイズ、表示遅延、色異常等)。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D009:
+        name: "レンズ内：ゴミ/キズ/汚れ"
+        description: "レンズ内部(光学系内部)のゴミ・キズ・汚れの混入。製造・組立由来の場合が多い。分解しないと除去・確認できない内部のものに限る。前玉の表面などに付いたものは D010。内部か表面か判断できない場合は D010。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+        decision_rule: "明らかにレンズ内部(分解が必要)と判断できる場合のみD009、それ以外はD010"
+
+      D010:
+        name: "レンズ表面：ゴミ/汚れ/キズ"
+        description: "前玉など、レンズの外側の表面に付着したゴミ・汚れ・指紋等、および表面のキズ。ユーザの使用環境で付いた可能性が高く、メーカー責任の範囲外とみなす。分解が必要なレンズ内部のものは D009。内部か表面か判断できない場合もこちら。"
+        record_type: "failure"
+        responsibility: "user_or_unknown"
+        description_status: "ai_inferred"
+        decision_rule: "前玉等の表面のもの、または内部か表面か判断できないものはD010"
+
+      D011:
+        name: "レンズ動作不良"
+        description: "電源のオン・オフ時にレンズ(鏡筒)が繰り出さない・収納されない、途中で止まる等、レンズの繰り出し・収納の動作不良。ズーム操作時の不良は D013、異音だけの訴えは D015。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D012:
+        name: "レンズ先端リング外れ"
+        description: "レンズ先端の化粧リング・飾りリング等が外れる、緩む不具合。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D013:
+        name: "ズーム動作不良/異音"
+        description: "ズーム操作をしてもズームしない、途中で止まる、動きが不安定、ズーム操作時に異音がする等、ズーム機構の不具合。ズームレバー自体の操作不良は D026。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D014:
+        name: "AF不具合"
+        description: "オートフォーカスが作動しない、合焦しない、迷う、ピントがずれる等、AF全般の不具合。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D015:
+        name: "鏡筒から異音"
+        description: "ズーム操作時以外(電源オン・オフ時の繰り出し・収納、撮影時など)に鏡筒から異音がする。ズーム操作時の異音は D013。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D016:
+        name: "シャッター不具合"
+        description: "シャッターが切れない、シャッター羽根の動作異常、シャッター速度の異常等。シャッターボタン(レリーズボタン)自体の操作不良は D027。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D018:
+        name: "センサーゴミ"
+        description: "撮像センサーへのゴミの付着・混入(ゴミの写り込み)。コンパクトカメラはユーザがセンサーに触れられない構造のため、内部・表面を区別せずメーカー責任とみなす。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "verified"
+
+      D019:
+        name: "センサー不具合"
+        description: "撮像センサー自体の不良(欠陥画素の増加、センサーの故障等)と修理者が判断したもの。原因部位を問わず画像の異常を訴えるものは D020、ゴミの写り込みは D018。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D020:
+        name: "画像不具合"
+        description: "撮影画像の異常(線・点・ノイズ・色再現不良等)。原因部位が特定されていない画像の不具合。センサー自体の不良と判断されたものは D019、ピントの不良は D014、ゴミの写り込みは D018。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D021:
+        name: "電源ボタン不具合"
+        description: "電源ボタン(電源スイッチ)自体の動作不良(押しても反応しない、感触異常、固着等)。電源系統全般の不具合は D001。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D022:
+        name: "モードスイッチ不具合"
+        description: "撮影モードスイッチ・モードダイヤルの動作不良、認識不良、固着等。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D023:
+        name: "露出補正ダイヤル不具合"
+        description: "露出補正ダイヤルの動作不良、認識不良、固着等。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D024:
+        name: "メインダイヤル不具合"
+        description: "メイン電子ダイヤル(主要な操作ダイヤル)の操作不良、回転不良、認識不良。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D025:
+        name: "サブダイヤル不具合"
+        description: "サブ電子ダイヤル(補助の操作ダイヤル・コントロールリング等)の操作不良、回転不良、認識不良。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D026:
+        name: "ズームレバー不具合"
+        description: "ズームレバー自体の操作不良(反応しない、戻らない、固着、感触異常等)。ズーム機構の不良は D013。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D027:
+        name: "レリーズボタン不具合"
+        description: "シャッターボタン(レリーズボタン)の動作不良(押しても反応しない、半押しが効かない、感触異常等)。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D028:
+        name: "背面操作部不具合"
+        description: "背面の各種ボタン・十字キー等の操作不良。ダイヤル・ズームレバー・タッチパネルは別分類。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D029:
+        name: "端子カバー不良"
+        description: "USB・HDMI等の端子カバーの破損、外れ、閉まらない等の不具合。電池蓋・メディア蓋の開閉検知の不具合は D041。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D030:
+        name: "外観不良"
+        description: "外装のキズ・汚れ・色違い・塗装はがれ・変形等、外観の不具合。レンズ表面のものは D010。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D031:
+        name: "ストロボ不良"
+        description: "内蔵ストロボの発光不良、ポップアップ機構の不良、調光異常等。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D032:
+        name: "メディア不具合"
+        description: "メモリーカード関連の不具合(認識不良、書き込みエラー、データ破損、スロット不良等)。カード自体の不良で本体に異常が無い場合は D046。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D033:
+        name: "日付設定/電池不良"
+        description: "日付・時刻設定が保持されない、内蔵バックアップ電池の劣化、設定がリセットされる等。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D034:
+        name: "マイク/スピーカー不具合"
+        description: "内蔵マイクで録音できない・音が小さい、スピーカーから音が出ない・音割れする等、音声の入出力の不具合。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D035:
+        name: "水準器不具合"
+        description: "電子水準器の表示異常、傾き検知精度の不良等。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D036:
+        name: "WiFi関連不具合"
+        description: "Wi-Fi接続不良、設定異常、画像転送エラー、リモート撮影不良等、Wi-Fi機能関連の不具合。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D037:
+        name: "Bluetooth関連不具合"
+        description: "Bluetooth接続不良、ペアリング不良、スマートフォン連携機能の不良等。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D038:
+        name: "GPS関連不具合"
+        description: "GPS(位置情報)機能の不具合(測位できない、位置情報の誤り、ログ取得不良等)。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D039:
+        name: "IS駆動不具合"
+        description: "手ブレ補正(IS)の駆動不良、補正効果なし、異音、エラー表示等。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D040:
+        name: "USB関連不具合"
+        description: "USB端子・USB接続経由の通信不良、認識不良、コネクタ破損等。充電できないものは D002。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      D041:
+        name: "蓋検知SW不具合"
+        description: "電池蓋・メディア蓋等の開閉検知スイッチの不具合。蓋を閉めても認識しない、蓋を開けても反応しない等。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
+      # --- サービス系(検査・清掃・OH・ファームアップ)---
+      D042:
+        name: "検査"
+        description: "お客様依頼またはメーカー判断による検査・点検作業を行った修理データ。"
+        record_type: "service"
+        responsibility: "user_or_unknown"
+        description_status: "ai_inferred"
+
+      D043:
+        name: "クリーニング"
+        description: "清掃・クリーニング作業を行った修理データ。"
+        record_type: "service"
+        responsibility: "user_or_unknown"
+        description_status: "ai_inferred"
+
+      D044:
+        name: "オーバーホール"
+        description: "定期メンテナンス・オーバーホール作業を行った修理データ。"
+        record_type: "service"
+        responsibility: "user_or_unknown"
+        description_status: "ai_inferred"
+
+      D045:
+        name: "ファームアップ"
+        description: "ファームウェアアップデートで対応した修理データ。ユーザが不具合を訴えていても、ファームアップで解消した場合はこのコードに分類する。"
+        record_type: "service"
+        responsibility: "user_or_unknown"
+        description_status: "ai_inferred"
+
+      D046:
+        name: "接続機器要因"
+        description: "接続・使用したアクセサリー(充電器・メモリーカード・ケーブル・スマートフォン等)の側に原因があり、本体には異常がないと判断された修理データ。"
+        record_type: "failure"
+        role: "connected_device"
+        responsibility: "user_or_unknown"
+        description_status: "ai_inferred"
+
+      D047:
+        name: "設定・操作起因"
+        description: "カメラの設定や操作方法が原因で現象が発生しており、本体に異常がないもの。設定の解除・変更や操作の説明で解消した修理データ。部品の不具合が見つかった場合はこのコードにしない。"
+        record_type: "failure"
+        responsibility: "user_or_unknown"
+        description_status: "ai_inferred"
+
+      # --- その他/特殊コード ---
+      D048:
+        name: "その他"
+        description: "上記いずれの分類にも該当しない修理データ。本コード体系の見直し検討対象。"
+        record_type: "failure"
+        role: "other"
+        responsibility: "manufacturer"
+        is_special: true
+        description_status: "ai_inferred"
+
+      D_UNK:
+        name: "判定不能"
+        description: "情報不足等で分類できない修理データ。コメントが極端に短い、内容が抽象的等の場合。"
+        record_type: "unknown"
+        role: "unknown"
+        responsibility: "user_or_unknown"
+        is_special: true
+        description_status: "ai_inferred"
 
 # =============================================================================
 # 環境要因（製品共通、多値選択）
@@ -829,6 +1226,7 @@ claim_reproduction_statuses:
     description: |
       修理者がその申告について原因・所見・処置を書いている(「再現した」と明記されていなくてもよい)。
       ユーザコメント側の「ご指摘外の現象」も含む。
+      ユーザから提出された画像・動画・撮影データなどの証左で、修理者が現象を確認できた場合も含む(現品で再現しなかった場合も)。
     counts_as_confirmed: true
 
   partial:
@@ -841,6 +1239,7 @@ claim_reproduction_statuses:
     description: |
       確認したが症状を確認できなかった(「異常はございませんでした」等の定型文、二重否定の言い回しを含む)。
       予防交換もこちら。
+      「ご指摘の現象は確認できませんでした」と書かれていれば、カメラ内部のエラー履歴や推定での部品交換があってもこちら。
     counts_as_confirmed: false
 
   not_mentioned:

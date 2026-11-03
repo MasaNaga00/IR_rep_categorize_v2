@@ -95,7 +95,7 @@ git push
      ```
      python -m pip install --proxy http://<プロキシ>:<ポート> --cert C:\path\to\corp-ca.pem -r requirements-dev.txt
      ```
-   > 確認: `Successfully installed ... pyyaml ... requests ... python-dotenv ... pytest ... requests-mock` のように表示されること。
+   > 確認: `Successfully installed ... pyyaml ... requests ... python-dotenv ... openpyxl ... pytest ... requests-mock` のように表示されること。
    - Python 3.15 向けにインストールできないライブラリがあった場合は、ライブラリ名を手順11の書式で Mac 側に伝える。
 
 **2回目以降**: コマンドプロンプトを開くたびに、`cd /d C:\work\IR_rep_categorize_v2` と `.venv\Scripts\activate` だけ行う。
@@ -108,7 +108,7 @@ git push
 python -m pytest tests/v2 -q
 ```
 
-> 確認: 最後の行が **`129 passed`** になること(2026-11-02 時点の件数。更新で増えることがある)。
+> 確認: 最後の行が **`155 passed`** になること(2026-11-03 時点の件数。更新で増えることがある)。
 
 - 失敗した場合は、`FAILED tests/v2/test_xxx.py::test_r43_...` の行を控えて、手順11の書式で Mac 側に伝える。テスト名の `r43` は要件 ID(R-43)を表す。
 
@@ -134,7 +134,7 @@ Windows 側で変更するファイル(YAML、プロンプト、接続情報、�
    ```
    python repclass_cli.py check --local-dir C:\work\repclass_local
    ```
-   > 確認: `OK: ... version=0.3.0 製品=ML(48), LENS(38)` と表示されること。
+   > 確認: `OK: ... version=0.4.1 製品=ML(49), LENS(40), DC(48)` のように表示されること(バージョンとコード数は、YAML の更新で変わる)。
 
 ---
 
@@ -172,13 +172,13 @@ Windows 側で変更するファイル(YAML、プロンプト、接続情報、�
 
 ## 手順6: 架空データで通しの確認をする
 
-実データの前に、架空データ(35件。うち2件は除外される想定)で、Python → Dify → 結果の作成までを通す。
+実データの前に、架空データ(45件。うち2件は除外される想定)で、Python → Dify → 結果の作成までを通す。
 
 ### 6-1. Dify を呼ばずに、送る内容だけを作る(dry-run)
 ```
 python repclass_cli.py run --input tests\fixtures\synthetic\repairs.csv --local-dir C:\work\repclass_local --dry-run
 ```
-> 確認: `dry-run: 入力 35 / 除外 2 / 送信予定 33 / バッチ 5`
+> 確認: `dry-run: 入力 45 / 除外 2 / 送信予定 43 / バッチ 6`
 
 ### 6-2. Dify の画面で1バッチだけ試す
 - `C:\work\repclass_local\outputs\<timestamp>\raw\batch_001_request.json` をメモ帳で開く。
@@ -189,7 +189,7 @@ python repclass_cli.py run --input tests\fixtures\synthetic\repairs.csv --local-
 ```
 python repclass_cli.py run --input tests\fixtures\synthetic\repairs.csv --local-dir C:\work\repclass_local
 ```
-> 確認: `入力 35 / 除外 2 / ok … / warning … / error 0` のように表示され、error が 0 件であること。
+> 確認: `入力 45 / 除外 2 / ok … / warning … / error 0` のように表示され、error が 0 件であること。
 - error がある場合は、表示されたエラーの種類を見て、`docs\dify\v2_workflow_setup.md` の第4節(トラブルシューティング)を確認する。
   - `api_error`: 接続設定の問題
   - `parse_error`: 出力が JSON になっていない
@@ -217,7 +217,7 @@ python repclass_cli.py evaluate --gold tests\fixtures\synthetic\expected_claims.
 
 ### 7-2. 列名と製品種別の値を確認する
 - 列名が `ID`、`事業コード`、`user_comment`、`repair_comment`、`Internal_1`、`Internal_2` と違う場合は、`C:\work\repclass_local\input_columns.yaml` の右側を実データの列名に書き換える。
-- 製品種別の列の値は、YAML の製品 ID(`ML`、`LENS`)と同じである必要がある。違う値の行は「YAML にない製品」として除外される。
+- 製品種別の列の値は、YAML の製品 ID(`ML`、`LENS`、`DC`)と同じである必要がある。違う値の行は「YAML にない製品」として除外される。
 
 ### 7-3. dry-run で件数を確認する
 ```
@@ -297,6 +297,24 @@ python repclass_cli.py evaluate --gold C:\work\repclass_local\data\gold_sample_1
   - 判断を誤ったパターンについて、「規則」の該当箇所に具体例を1つ足すのが効きやすい。
 - **YAML**: `C:\work\repclass_local\classification_codes.yaml` で、選び間違えやすいコードの説明文を具体的にする。
   - 直したら、必ず `python repclass_cli.py check --local-dir C:\work\repclass_local` を実行する。
+  - **Excel で直す場合**(コードの一覧を見ながら直したいとき。R-58〜R-63):
+    1. Excel に書き出す。
+       ```
+       python repclass_cli.py codes-export --local-dir C:\work\repclass_local
+       ```
+       → `C:\work\repclass_local\classification_codes.xlsx` ができる。すでにある場合は上書きしない(上書きするときは `--force`)。
+    2. Excel で直して保存する。
+       - シート `ML`・`LENS` は 1行=1コード。記録区分・責任区分・役割はドロップダウンで選ぶ。
+       - シート `環境要因` の「常にユーザ起因」は TRUE / FALSE。
+       - 各列の意味は、シート `説明` にある。
+    3. YAML に戻す。
+       ```
+       python repclass_cli.py codes-import --local-dir C:\work\repclass_local --xlsx C:\work\repclass_local\classification_codes.xlsx
+       ```
+       - 問題があれば、YAML は書き換えずに問題の一覧が出る。Excel を直して、もう一度実行する。
+       - 成功すると、追加・変更・削除されたコードの一覧が出る。元の YAML は `classification_codes_日時.bak.yaml` として残る。
+       - YAML のコメントは作り直しになる(手で書き足したコメントは残らない)。
+    4. Excel で書き出した後に YAML を直接直した場合は、古い Excel を戻すと YAML 側の修正が消える。戻す前に、もう一度書き出し直す(`--force`)。
 - **比べ方**: 調整の前後で、**同じサンプル**・**同じ正解ファイル**で実行して評価する。
   - どの実行でどのプロンプトを使ったかは、`run_meta.json` の `prompt_sha256` で区別できる。
   - 何を変えたかを、簡単なメモで残しておくとよい。
@@ -324,4 +342,4 @@ python repclass_cli.py evaluate --gold C:\work\repclass_local\data\gold_sample_1
   - `テスト失敗: test_r43_chain`
   - `要望: CSV を Shift-JIS のまま読めるようにしてほしい`
   - `精度: 予防交換の行が「再現」になる例が多い`
-- Mac 側で仕様・テスト・コードを直したら、新しい版を GitHub に送る。Windows 側は手順1(更新)と手順2・3をやり直す。
+- Mac 側で仕様・テスト・コードを直したら、新しい版を GitHub に送る。Windows 側は手順1(更新)と手順2・3をやり直す(必要なライブラリが増えることがあるので、`pip install -r requirements-dev.txt` も毎回実行する)。

@@ -25,7 +25,7 @@
 ## 構成
 
 ```
-repclass_cli.py              起動用スクリプト(init / check / run / evaluate)
+repclass_cli.py              起動用スクリプト(init / check / run / evaluate / codes-export / codes-import)
 src/repclass/                プログラム本体
 config/
   classification_codes.yaml  コード体系の初期値
@@ -51,6 +51,8 @@ python repclass_cli.py init  --local-dir <ローカル作業フォルダ>
 python repclass_cli.py check --local-dir <ローカル作業フォルダ>
 python repclass_cli.py run   --input <CSV(UTF-8)> --local-dir <ローカル作業フォルダ> [--dry-run] [--resume <timestamp>]
 python repclass_cli.py evaluate --gold <正解CSV> --run <実行フォルダ> --local-dir <ローカル作業フォルダ>
+python repclass_cli.py codes-export --local-dir <ローカル作業フォルダ>              (YAML → Excel)
+python repclass_cli.py codes-import --local-dir <ローカル作業フォルダ> --xlsx <Excel>  (Excel → YAML)
 ```
 
 - Windows 側で変更するファイル(YAML・プロンプト・接続情報・データ・結果)は、コードとは別の**ローカル作業フォルダ**に置く(要件 R-05a)。

@@ -30,7 +30,8 @@
 
 | ファイル | 変更の例 |
 |---|---|
-| `classification_codes.yaml` | コードの追加、説明文・responsibility・環境要因の調整。**キーの構造は変えない**。変更後は `check` を実行する |
+| `classification_codes.yaml` | コードの追加、説明文・responsibility・環境要因の調整。**キーの構造は変えない**。変更後は `check` を実行する。Excel で直す場合は `codes-export` → Excel で修正 → `codes-import`(R-58〜R-63) |
+| `classification_codes.xlsx` | `codes-export` で書き出した確認・修正用の Excel |
 | `prompts/system_prompt.md` | プロンプトの調整(変更後は Dify に貼り直す) |
 | `input_columns.yaml` | 入力 CSV の列名が既定と違う場合に合わせる |
 | `eval_name_map.csv` | 評価用の、過去の名称とコードの対応表 |
@@ -58,14 +59,14 @@ pip install -r requirements-dev.txt
 ```
 
 - 社内プロキシや証明書でインストールできない場合は、`pip install --cert <証明書のパス> -r requirements-dev.txt` を試す。
-- 必要なライブラリは `pyyaml`、`requests`、`python-dotenv`、テスト用に `pytest`、`requests-mock` だけ(R-09、R-11)。
+- 必要なライブラリは `pyyaml`、`requests`、`python-dotenv`、`openpyxl`、テスト用に `pytest`、`requests-mock` だけ(R-09、R-11)。
 - Python 3.15 でインストールできないライブラリがあれば、第7節の書式で報告する。
 
 ### 2.3 テストの実行
 ```
 python -m pytest tests/v2 -q
 ```
-- 期待: **129 passed**(2026-11-02 時点)。
+- 期待: **155 passed**(2026-11-03 時点)。
 - 失敗した場合は、失敗したテスト名(`test_r43_...` のように要件 ID が入っている)を第7節の書式で報告する。
 
 ### 2.4 ローカル作業フォルダの作成
@@ -89,7 +90,7 @@ python repclass_cli.py run --input tests\fixtures\synthetic\repairs.csv --local-
 python repclass_cli.py evaluate --gold tests\fixtures\synthetic\expected_claims.csv --run C:\work\repclass_local\outputs\<timestamp> --local-dir C:\work\repclass_local
 ```
 
-- 期待: 入力 35 / 除外 2 / error 0。
+- 期待: 入力 45 / 除外 2 / error 0。
 - `user_code`・`reproduction`・`repair_code` の一致率を確認する。
 - 不一致は `<実行フォルダ>\evaluation\mismatches.csv` にある。該当シナリオのねらいを `tests/fixtures/synthetic/README.md` で確認し、プロンプトを調整する。
 

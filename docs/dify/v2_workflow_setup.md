@@ -83,7 +83,7 @@ python repclass_cli.py run --input tests\fixtures\synthetic\repairs.csv --local-
 3. `result` が `{"results": [...]}` の形になり、10修理分の結果が入っていることを確認する。
 
 ### 3.2 架空データでの通し確認
-架空データ(35件、うち2件は除外される想定)で、Python から Dify を呼んで評価する。
+架空データ(45件、うち2件は除外される想定)で、Python から Dify を呼んで評価する。
 
 ```
 python repclass_cli.py run --input tests\fixtures\synthetic\repairs.csv --local-dir C:\work\repclass_local

@@ -4,8 +4,10 @@
   python repclass_cli.py check     [--local-dir ...] [--codebook ...]
   python repclass_cli.py run       --input <CSV> [--local-dir ...] [--dry-run] [--resume <timestamp>]
   python repclass_cli.py evaluate  --gold <正解CSV> --run <実行フォルダ> [--local-dir ...]
+  python repclass_cli.py codes-export [--local-dir ...] [--xlsx ...] [--force]
+  python repclass_cli.py codes-import --xlsx <Excel> [--local-dir ...]
 
-各サブコマンドの引数は、python -m repclass.<module> と同じ(要件定義書 R-16, R-05a, R-49, R-55)。
+各サブコマンドの引数は、python -m repclass.<module> と同じ(要件定義書 R-16, R-05a, R-49, R-55, R-58, R-59)。
 """
 from __future__ import annotations
 
@@ -19,6 +21,8 @@ COMMANDS = {
     "check": "repclass.check_codebook",
     "run": "repclass.run",
     "evaluate": "repclass.evaluate",
+    "codes-export": "repclass.codes_export",
+    "codes-import": "repclass.codes_import",
 }
 
 

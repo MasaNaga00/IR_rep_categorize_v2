@@ -14,6 +14,16 @@ product_categories:
         description: 電源が入らない、電源が落ちる、起動しない等、電源系統全般の不具合。電源SWの操作不良はM021に分類。
         record_type: failure
         responsibility: manufacturer
+      M002:
+        name: エラー
+        description: 操作中にエラーメッセージ・エラーコードが表示される、エラー停止する。具体的な機能不良が特定できない場合のエラー表示も含む。
+        record_type: failure
+        responsibility: manufacturer
+      M003:
+        name: 動作不良
+        description: 特定の機能・操作が正常に動作しない包括的なカテゴリ。他の具体的な分類に該当しない動作異常。
+        record_type: failure
+        responsibility: manufacturer
       M004:
         name: 熱くなる
         description: 本体が異常に発熱する、発熱による動作停止や不安定動作が発生する。
@@ -136,6 +146,11 @@ product_categories:
         record_type: failure
         responsibility: user_or_unknown
         role: connected_device
+      M048:
+        name: 設定・操作起因
+        description: カメラの設定や操作方法が原因で現象が発生しており、本体に異常がないもの。設定の解除・変更や操作の説明で解消した修理データ。部品の不具合が見つかった場合はこのコードにしない。
+        record_type: failure
+        responsibility: user_or_unknown
       M_UNK:
         name: 判定不能
         description: 情報不足等で分類できない修理データ。コメントが極端に短い、内容が抽象的等の場合。
@@ -154,6 +169,11 @@ product_categories:
       L008:
         name: ズーム引掛り/作動不具合
         description: ズームリングの動作不良（重い、軽い、引っ掛かり、動かない、ザラつき等）。
+        record_type: failure
+        responsibility: manufacturer
+      L028:
+        name: レンズ内：ゴミ/キズ/汚れ
+        description: レンズ内部（光学系内部）のゴミ・キズ・汚れの混入。製造・組立由来の場合が多い。分解しないと除去・確認できない内部のものに限る。前玉・後玉の表面に付いたゴミ・汚れ・キズは L039。内部か表面か判断できない場合は L039。
         record_type: failure
         responsibility: manufacturer
       L031:
@@ -183,7 +203,64 @@ product_categories:
         record_type: failure
         responsibility: user_or_unknown
         role: connected_device
+      L039:
+        name: レンズ表面：ゴミ/汚れ/キズ
+        description: 前玉・後玉など、レンズの外側の表面に付着したゴミ・汚れ・指紋等、および表面のキズ。ユーザの使用環境で付いた可能性が高く、メーカー責任の範囲外とみなす。分解が必要なレンズ内部のゴミ・キズ・汚れは L028。内部か表面か判断できない場合もこちら。
+        record_type: failure
+        responsibility: user_or_unknown
       L_UNK:
+        name: 判定不能
+        description: 情報不足等で分類できない修理データ。コメントが極端に短い、内容が抽象的等の場合。
+        record_type: unknown
+        responsibility: user_or_unknown
+        role: unknown
+  DC:
+    name: コンパクトカメラ
+    code_prefix: D
+    failure_categories:
+      D001:
+        name: 電源不良
+        description: 電源が入らない、起動しない等、電源系統全般の不具合。使用中にフリーズする・電源が切れるものは D003、電源ボタン自体の操作不良は D021、充電できないものは D002。
+        record_type: failure
+        responsibility: manufacturer
+      D010:
+        name: レンズ表面：ゴミ/汚れ/キズ
+        description: 前玉など、レンズの外側の表面に付着したゴミ・汚れ・指紋等、および表面のキズ。ユーザの使用環境で付いた可能性が高く、メーカー責任の範囲外とみなす。分解が必要なレンズ内部のものは D009。内部か表面か判断できない場合もこちら。
+        record_type: failure
+        responsibility: user_or_unknown
+      D020:
+        name: 画像不具合
+        description: 撮影画像の異常(線・点・ノイズ・色再現不良等)。原因部位が特定されていない画像の不具合。センサー自体の不良と判断されたものは D019、ピントの不良は D014、ゴミの写り込みは D017 / D018。
+        record_type: failure
+        responsibility: manufacturer
+      D042:
+        name: 検査
+        description: お客様依頼またはメーカー判断による検査・点検作業を行った修理データ。
+        record_type: service
+        responsibility: user_or_unknown
+      D043:
+        name: クリーニング
+        description: 清掃・クリーニング作業を行った修理データ。
+        record_type: service
+        responsibility: user_or_unknown
+      D045:
+        name: ファームアップ
+        description: ファームウェアアップデートで対応した修理データ。ユーザが不具合を訴えていても、ファームアップで解消した場合はこのコードに分類する。
+        record_type: service
+        responsibility: user_or_unknown
+      D046:
+        name: 接続機器要因
+        description: 接続・使用したアクセサリー(充電器・メモリーカード・ケーブル・スマートフォン等)の側に原因があり、本体には異常がないと判断された修理データ。
+        record_type: failure
+        responsibility: user_or_unknown
+        role: connected_device
+      D048:
+        name: その他
+        description: 上記いずれの分類にも該当しない修理データ。本コード体系の見直し検討対象。
+        record_type: failure
+        responsibility: manufacturer
+        role: other
+      D_UNK:
         name: 判定不能
         description: 情報不足等で分類できない修理データ。コメントが極端に短い、内容が抽象的等の場合。
         record_type: unknown
@@ -256,7 +333,7 @@ environment_factors:
 claim_reproduction_statuses:
   reproduced:
     name: 再現
-    description: 修理者が症状を確認した(原因・処置の記載を含む)。
+    description: 修理者が症状を確認した(原因・処置の記載、ユーザ提出の証左での確認を含む)。
     counts_as_confirmed: true
   partial:
     name: 一部再現
@@ -264,7 +341,7 @@ claim_reproduction_statuses:
     counts_as_confirmed: true
   not_reproduced:
     name: 再現せず
-    description: 確認したが症状を確認できなかった。予防交換を含む。
+    description: 確認したが症状を確認できなかった。予防交換、エラー履歴のみ・推定交換を含む。
     counts_as_confirmed: false
   not_mentioned:
     name: 記載なし

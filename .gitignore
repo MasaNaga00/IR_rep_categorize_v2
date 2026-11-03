@@ -16,3 +16,8 @@ outputs/
 .DS_Store
 .vscode/
 .idea/
+
+# コード体系の Excel 入出力で作られるファイル(R-58, R-62)
+config/classification_codes.xlsx
+*.bak.yaml
+~$*.xlsx
