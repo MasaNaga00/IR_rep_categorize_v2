@@ -1,0 +1,277 @@
+"""架空テストデータ生成(tools/fixture_gen/README.md 参照)"""
+import csv, json, sys
+from pathlib import Path
+
+OUT = Path(sys.argv[1])
+OUT.mkdir(parents=True, exist_ok=True)
+
+# claims: (sub_id, user_code, reproduction, basis, ref, repair_code)
+# env: (factor, source, abnormal_use)
+# extra: (description, repair_code)
+S = []
+def add(id, prod, pattern, aim, user, repair, claims, env=(), extra=(), i1="", i2="", note=""):
+    S.append(dict(id=id, prod=prod, pattern=pattern, aim=aim, user=user, repair=repair,
+                  claims=claims, env=list(env), extra=list(extra), i1=i1, i2=i2, note=note))
+
+FU = "※作業に伴いカメラ設定を初期化しました※最新ファームウエアに更新しました（Ver.1.1.1→1.2.1）"
+NG = "関連箇所を点検いたしましたが、異常はございませんでした。"
+
+add("T001","ML","単一・原因記載で再現","「再現した」と書かれていなくても原因の記載で再現とみなす",
+    "電源ボタンを押しても電源が入らない。充電済みのバッテリーに交換しても変わらない。購入から1年ほど使用している。",
+    "電源基板の半田部にクラックが発生しており、通電不良となっていたため、電源が入らない現象が発生していました。電源基板【基板ユニット】を交換しました。※作業に伴いカメラ設定を初期化しました",
+    [(1,"M001","reproduced","direct",None,"M001")])
+add("T002","ML","単一・否定表現で再現せず","回りくどい否定表現を再現せずと判定",
+    "シャッターボタンを押しても反応しないことがある。連写中に起きることが多い気がする。",
+    "レリーズ動作および連写動作を繰り返し確認しましたが、ご指摘の症状が発生しないことを確認いたしました。" + NG + "清掃・点検のみ実施しております。",
+    [(1,"M022","not_reproduced","direct",None,None)])
+add("T003","ML","①②別々に再現(付随のファーム更新あり)","基本形。代表故障は番号の小さい方。付随のファーム更新を処置とみなさない",
+    "①AFが合わないことが多く、特に暗い場所でピントが迷う。②背面の液晶に縦のスジが入るようになった。",
+    "①AFユニットの不具合により、ご指摘の現象が発生していたため、AFユニットを交換しました。②LCDパネルの不具合により、ご指摘の現象が発生していたため、LCDパネルを交換しました。" + FU,
+    [(1,"M005","reproduced","direct",None,"M005"),(2,"M017","reproduced","direct",None,"M017")])
+add("T004","ML","①②まとめ書き(同じ部品)","旧方式で分割できなかったパターン1。②の修理者視点コードは②自身のユーザ視点コード",
+    "①電源が入らないことがある。②電源が入っても液晶が表示されないことがある。",
+    "①②同じ電気部品(DC/DCコンバータ)の不良により、ご指摘の現象が発生していたため、不具合箇所を含むメイン基板を交換しました。",
+    [(1,"M001","reproduced","direct",None,"M001"),(2,"M017","reproduced","direct",None,"M017")])
+add("T005","ML","②は①と同原因","同原因:再現は引き継ぎ、repair_code は②自身のユーザ視点コード",
+    "①電源が入らない。②電源が入った時も液晶が映らないことがある。",
+    "①電源基板の不具合により、ご指摘の現象が発生していたため、電源基板を交換しました。②は①と同じ原因で発生していたと考えます。",
+    [(1,"M001","reproduced","direct",None,"M001"),(2,"M017","reproduced","same_cause",1,"M017")])
+add("T006","ML","説明の中で別の番号を引用","旧方式で分割できなかったパターン2",
+    "①AFが迷ってなかなか合焦しない。②シャッターを切る時に、ジーという異音がする。",
+    "①AF駆動部の摩耗を確認しました。②原因は①要因でした。AF駆動部から異音が発生していたため、AFユニットを交換しました。",
+    [(1,"M005","reproduced","direct",None,"M005"),(2,"M009","reproduced","same_cause",1,"M009")])
+add("T007","ML","ユーザコメント内で番号を引用","故障数は出現回数ではなく最大値(3)",
+    "①撮影中に電源が落ちる。②動画撮影中に録画が止まる。③②の後に本体が熱くなっている。",
+    "①②③内部の温度センサーの不具合により保護動作が働き、ご指摘の現象が発生していたため、不具合箇所を含む基板を交換しました。",
+    [(1,"M001","reproduced","direct",None,"M001"),(2,"M010","reproduced","direct",None,"M010"),(3,"M004","reproduced","direct",None,"M004")],
+    note="①②③まとめ書き。T004 と同じ扱い")
+add("T008","ML","番号飛び(①③)","②は申告なし(NO_CLAIM)の空の行になる",
+    "①シャッターが切れないことがある。③背面のボタンが効かない。",
+    "①シャッターユニットの不具合により、ご指摘の現象が発生していたため、シャッターユニットを交換しました。③背面操作ボタンの接点不良により、ご指摘の現象が発生していたため、操作ボタンを交換しました。",
+    [(1,"M007","reproduced","direct",None,"M007"),(2,"NO_CLAIM","not_mentioned","none",None,None),(3,"M026","reproduced","direct",None,"M026")])
+add("T009","ML","ユーザが落下を申告","ユーザ起因の環境要因 → NO",
+    "机から落としてしまい、それ以降電源が入らない。",
+    "落下の衝撃により電源基板が破損しており、ご指摘の現象が発生していました。外装に打痕あり。電源基板と外装部品を交換しました。",
+    [(1,"M001","reproduced","direct",None,"M001")],
+    env=[("impact","both",True)])
+add("T010","ML","修理者が衝撃痕を発見","ユーザの申告が無くても修理者の所見で NO",
+    "AFが合わない。",
+    "AFユニットの不具合により、ご指摘の現象が発生していたため、AFユニットを交換しました。マウント部に強い衝撃痕がありました。",
+    [(1,"M005","reproduced","direct",None,"M005")],
+    env=[("impact","repair",True)])
+add("T011","ML","夏の屋外(通常の使用)","高温でも通常の使用ならユーザ起因にしない → YES",
+    "夏に屋外で撮影していたら、本体が熱くなって止まってしまった。",
+    "高温警告による停止を確認しました。放熱部材の取付不良により熱がこもりやすくなっていたため、放熱部材を修正しました。",
+    [(1,"M004","reproduced","direct",None,"M004")],
+    env=[("heat","user",False)])
+add("T012","ML","炎天下の車内に放置","通常では考えづらい使用 → NO",
+    "炎天下の車内に一日置いていたら、液晶の表示がおかしくなった。",
+    "LCDに表示ムラを確認しました。高温によりLCDパネルが変形していたため、LCDパネルを交換しました。",
+    [(1,"M017","reproduced","direct",None,"M017")],
+    env=[("heat","both",True)])
+add("T013","ML","ファームアップで解消","ファームアップが処置そのもの。メーカー責任ではない → NO",
+    "AFが時々迷う。",
+    "最新ファームウエアに更新したところ、ご指摘の現象が改善されることを確認しました（Ver.1.1.1→1.2.1）。",
+    [(1,"M005","reproduced","direct",None,"M045")],
+    note="T003・T034 の付随のファーム更新と区別する")
+add("T014","ML","清掃の依頼のみ","依頼のみ。repair_code は作業内容のサービスコード",
+    "センサーの清掃をお願いします。",
+    "センサークリーニングを実施しました。",
+    [(1,"M043","request_only","direct",None,"M043")],
+    note="ユーザ視点コードもクリーニング(依頼内容)とする")
+add("T015","ML","レンズ側で対応(対象外)","対象外 → 接続機器要因(M047)。②はユーザと修理者でコードが違う",
+    "①レンズを付けるとエラーが出る。②電源が入らないことがある。",
+    "①レンズ側の通信不良によるもので、カメラ本体には異常はございませんでした。レンズ側にて対応いたします。②電源ボタンの接点不良により、ご指摘の現象が発生していたため、電源スイッチを交換しました。",
+    [(1,"M020","out_of_scope","direct",None,"M047"),(2,"M001","reproduced","direct",None,"M021")])
+add("T016","ML","ご指摘外の現象(【】の表記)","ユーザコメント側の【ご指摘外の現象】は再現扱い",
+    "①シャッターが切れない。②EVFにドット欠けあり【ご指摘外の現象】",
+    "①シャッターユニットの不具合により、ご指摘の現象が発生していたため、シャッターユニットを交換しました。②EVFパネルを交換しました。" + FU,
+    [(1,"M007","reproduced","direct",None,"M007"),(2,"M016","reproduced","direct",None,"M016")])
+add("T017","ML","修理者側だけの発見","申告は再現せず。追加の発見だけで YES、代表故障も追加の発見から",
+    "動画撮影中に音声が入らない。",
+    "音声記録は正常に動作することを確認しました。" + NG + "別途、内蔵ストロボのポップアップ不良を確認したため、ポップアップ機構を修正しました。",
+    [(1,"M010","not_reproduced","direct",None,None)],
+    extra=[("内蔵ストロボのポップアップ不良","M031")])
+add("T018","ML","①再現せず・②は①と同様","同原因で「再現せず」も引き継ぐ → NO",
+    "①AFが合わない。②ピントが前にずれる。",
+    "①AF動作を繰り返し確認しましたが、ご指摘の症状は確認できませんでした。②は①と同様の内容のため、同じ判断です。" + NG,
+    [(1,"M005","not_reproduced","direct",None,None),(2,"M005","not_reproduced","same_cause",1,"M005")],
+    note="②の repair_code は同原因ルールで②自身のユーザ視点コードになるが、確認できていないので集計対象外")
+add("T019","ML","一部再現(時々発生)","一部再現は確認できたに含む → YES",
+    "電源が勝手に切れる。",
+    "長時間の連続動作で、時々電源断が発生することを確認しました。電源基板の不具合によるものと判断し、電源基板を交換しました。",
+    [(1,"M001","partial","direct",None,"M001")])
+add("T020","ML","②について記載なし","記載なし → ②は集計対象外",
+    "①AFが合わない。②液晶が暗い気がする。",
+    "①AFユニットの不具合により、ご指摘の現象が発生していたため、AFユニットを交換しました。",
+    [(1,"M005","reproduced","direct",None,"M005"),(2,"M017","not_mentioned","none",None,None)])
+add("T021","ML","ユーザコメントが空欄","故障数1。依頼のみ・点検",
+    "",
+    "外観および動作の点検を実施しました。" + NG,
+    [(1,"M_UNK","request_only","direct",None,"M042")])
+add("T022","LENS","レンズ:AF不良とカビ","LENS のコード体系。カビはメーカー責任ではないが①で YES",
+    "①AFが動かない。②レンズの中にカビのようなものが見える。",
+    "①AFモーターの不具合により、ご指摘の現象が発生していたため、AFモーターを交換しました。②内部レンズにカビの発生を確認したため、清掃を実施しました。",
+    [(1,"L001","reproduced","direct",None,"L001"),(2,"L031","reproduced","direct",None,"L031")])
+add("T023","ML","雨の中で使用","水濡れは常にユーザ起因(雨を含む)→ NO",
+    "雨の中で撮影していたら、電源が入らなくなった。",
+    "電源基板に腐食、水濡れ痕を確認しました。水濡れにより、ご指摘の現象が発生していたため、電源基板を交換しました。",
+    [(1,"M001","reproduced","direct",None,"M001")],
+    env=[("water","both",False)],
+    note="abnormal_use が false でも always_user_caused でユーザ起因")
+add("T024","ML","センサー表面のゴミ","再現したがメーカー責任でないコード → NO",
+    "撮影した画像に黒い点が写り込む。",
+    "撮像センサー表面にゴミの付着を確認しました。センサー表面の清掃を実施しました。",
+    [(1,"M008","reproduced","direct",None,"M013")])
+add("T025","ML","同原因の連鎖(③→②→①)","参照の連鎖をたどって再現を引き継ぐ",
+    "①電源が入らない。②液晶が映らない。③ファインダーも映らない。",
+    "①電源基板の不具合により、ご指摘の現象が発生していたため、電源基板を交換しました。②は①と同原因と考えます。③は②と同原因と考えます。",
+    [(1,"M001","reproduced","direct",None,"M001"),(2,"M017","reproduced","same_cause",1,"M017"),(3,"M016","reproduced","same_cause",2,"M016")])
+add("T026","PRN","YAMLにない製品種別","処理対象から除外される","印刷がかすれる。","ヘッドを交換しました。",[],
+    note="除外(product_type 不明)")
+add("T027","ML","IDの重複(T001と同じID)","2行目以降は除外される","AFが合わない。","AFユニットを交換しました。",[],
+    note="除外(ID重複)。CSV上の ID は T001")
+add("T028","ML","内部コメントにだけショック痕","内部コメントは LLM に渡さないので YES のまま",
+    "AFが動かない。",
+    "AFユニットの不具合により、ご指摘の現象が発生していたため、AFユニットを交換しました。",
+    [(1,"M005","reproduced","direct",None,"M005")],
+    i1="ショック痕あるが初回のため無償対応", note="内部コメントを使うと判断が変わり得る例")
+add("T029","LENS","レンズ:ズームが重い","処置の記載で再現",
+    "ズームリングが重くて回しにくい。",
+    "ズームカム部のグリス切れを確認しました。グリスアップを実施しました。",
+    [(1,"L008","reproduced","direct",None,"L008")])
+add("T030","ML","前置きに「ショック品」","丸数字の前の前置きも読む。修理者の前置きでユーザ起因 → NO",
+    "①シャッターが切れない。②液晶にヒビが入っている。",
+    "ショック品。①シャッターユニットの不具合により、ご指摘の現象が発生していたため、シャッターユニットを交換しました。②LCDパネルを交換しました。",
+    [(1,"M007","reproduced","direct",None,"M007"),(2,"M017","reproduced","direct",None,"M017")],
+    env=[("impact","repair",True)])
+add("T031","ML","前置き:メンテナンスから修理に移行","依頼で入庫しても、申告が再現すれば通常どおり YES",
+    "メンテナンスで入庫しましたが、修理に移行しました。①シャッターボタンの反応が悪い。②ダイヤルが空回りする。",
+    "①レリーズボタンの接点摩耗により、ご指摘の現象が発生していたため、レリーズボタンを交換しました。②メイン電子ダイヤルの不具合により、ご指摘の現象が発生していたため、ダイヤルユニットを交換しました。",
+    [(1,"M022","reproduced","direct",None,"M022"),(2,"M023","reproduced","direct",None,"M023")])
+add("T032","ML","【オーバーホール】と予防交換","予防交換は再現なしとして扱う",
+    "【オーバーホール】①シャッターボタンが効かなくなっている。②メカ機構部品の予防交換",
+    "①レリーズボタンの不具合により、ご指摘の現象が発生していたため、レリーズボタンを交換しました。②メカ機構部品を予防交換しました。オーバーホールを実施しました。",
+    [(1,"M022","reproduced","direct",None,"M022"),(2,"M044","not_reproduced","direct",None,None)],
+    note="②のユーザ視点コードはオーバーホール(依頼内容)とした")
+add("T033","ML","【修理上限金額】の記載","金額などの事務的な【】は無視する",
+    "【修理上限金額：100000円】背面のダイヤルを回しても反応しない。",
+    "サブ電子ダイヤルの不具合により、ご指摘の現象が発生していたため、ダイヤルユニットを交換しました。",
+    [(1,"M024","reproduced","direct",None,"M024")])
+add("T034","ML","付随のファーム更新(単一)","※の付随作業(初期化・ファーム更新)は処置とみなさない → YES",
+    "シャッターが切れないことがある。",
+    "メカの不具合により、ご指摘の現象が発生していたため、不具合箇所を含む部品を交換しました。" + FU,
+    [(1,"M007","reproduced","direct",None,"M007")],
+    note="修理者視点を M045 にすると誤って NO になる")
+add("T035","ML","「関連箇所を点検…異常はございませんでした」","よく出る否定の定型文 → 再現せず",
+    "動画を撮るとカクカクする。",
+    "動画撮影動作を確認しました。" + NG,
+    [(1,"M010","not_reproduced","direct",None,None)])
+
+add("T036","ML","設定が原因(連続撮影の枚数制限)","設定・操作起因 → メーカー責任ではない → NO。「異常はございませんでした」は設定解除後の確認なので再現せずにしない",
+    "連写するとすぐに止まってしまい、撮れる枚数が少ない。",
+    "連続撮影時の撮影枚数制限が設定されていたことにより、ご指摘の現象が発生することを確認しました。設定を解除後動作点検いたしましたが、異常はございませんでした。",
+    [(1,"M003","reproduced","direct",None,"M048")])
+add("T037","ML","設定が原因(表示先の設定)","設定・操作起因 → NO。動作不良・その他にしない",
+    "液晶モニターが真っ黒で何も映らない。",
+    "画面の表示先設定がファインダー固定になっていたことにより、ご指摘の現象が発生していることを確認しました。設定を解除後動作点検いたしましたが、異常はございませんでした。",
+    [(1,"M017","reproduced","direct",None,"M048")])
+
+add("T038","ML","現象未確認・エラー履歴で推定交換","「確認できませんでした」が最優先。エラー履歴・推定交換は再現の根拠にしない → NO",
+    "撮影していると、エラーが表示されて撮影できなくなる。",
+    "ご指摘の現象は確認できませんでしたが、カメラ内部のエラー履歴よりメカ機構部の不具合が発生していることを確認したため、不具合が想定される部品シャッターユニットを交換いたしました。",
+    [(1,"M002","not_reproduced","direct",None,None)])
+add("T039","ML","エラー頻発・現象未確認・関連部品交換","エラー履歴だけでは再現にしない → NO",
+    "エラー30が頻繁に出る。",
+    "ご指摘の現象を確認することができませんでしたが、カメラ内部のエラー履歴よりエラーが発生していることを確認したため、関連する部品基板ユニットを交換いたしました。",
+    [(1,"M002","not_reproduced","direct",None,None)])
+add("T040","ML","ユーザ提出の画像で現象を確認(例外)","ユーザ提出の証左で確認できた場合は、現品で再現しなくても再現 → YES",
+    "撮影した画像に横線が入ることがある。画像を添付します。",
+    "お預かりした画像データでご指摘の現象を確認しました。現品では再現しませんでしたが、撮像センサーユニットの不具合が想定されるため、撮像センサーユニットを交換いたしました。",
+    [(1,"M008","reproduced","direct",None,"M008")])
+
+add("T041","LENS","前玉表面の汚れ(傷と申告)","表面の拭き取れる汚れはレンズ表面(ユーザ責任)→ NO",
+    "フロントレンズに引っかいたような傷が数か所ある。",
+    "前玉表面を点検いたしましたところ、傷ではなく汚れであることを確認したため、表面を清掃いたしました。",
+    [(1,"L039","reproduced","direct",None,"L039")])
+add("T042","LENS","レンズ内部のゴミ","分解が必要な内部のゴミはレンズ内(メーカー責任)→ YES",
+    "レンズの中にゴミが見える。",
+    "分解点検いたしましたところ、レンズ内部にゴミの混入を確認したため、分解清掃を実施いたしました。",
+    [(1,"L028","reproduced","direct",None,"L028")])
+add("T043","LENS","内部か表面か判断できないゴミ","判断できない場合はレンズ表面(ユーザ責任)に倒す → NO",
+    "レンズにゴミが付いている。",
+    "レンズのゴミを清掃いたしました。",
+    [(1,"L039","reproduced","direct",None,"L039")])
+
+add("T044","DC","コンパクトカメラ:電源不良","DC のコード体系(接頭文字 D)→ YES",
+    "電源ボタンを押しても電源が入らない。",
+    "電源基板の不具合により、ご指摘の現象が発生していたため、電源基板を交換しました。",
+    [(1,"D001","reproduced","direct",None,"D001")])
+add("T045","DC","コンパクトカメラ:レンズ表面の汚れ","DC でもレンズ表面はユーザ責任 → NO",
+    "写真が白っぽくかすむ。",
+    "レンズ表面に汚れの付着を確認しました。表面を清掃いたしました。",
+    [(1,"D020","reproduced","direct",None,"D010")])
+
+# 責任(実際の YAML に合わせて手で列挙。生成後に YAML と照合する)
+NON_MFR = {"M013","M015","M042","M043","M044","M045","M047","M048","M_UNK","L031","L032","L033","L034","L035","L037","L038","L039","L_UNK","D010","D042","D043","D044","D045","D046","D047","D_UNK"}
+CONFIRMED = {"reproduced","partial"}
+USER_CAUSED_ALWAYS = {"impact","water"}
+
+# repairs.csv(実データと同じ列)
+with open(OUT/"repairs.csv","w",encoding="utf-8-sig",newline="") as f:
+    w = csv.writer(f)
+    w.writerow(["date","事業コード","Develop","Product_name","Serial","Garantee","user_comment","repair_comment","Internal_1","Internal_2","ID"])
+    for n,s in enumerate(S,1):
+        rid = "T001" if s["id"]=="T027" else s["id"]
+        w.writerow([f"11/{n}",s["prod"],"X000","TEST-MODEL",f"99{n:08d}","保証内",s["user"],s["repair"],s["i1"],s["i2"],rid])
+
+valid = [s for s in S if s["claims"]]
+# 期待値: 申告表(詳細版の正解ファイル形式 R-54 + basis/ref)
+with open(OUT/"expected_claims.csv","w",encoding="utf-8-sig",newline="") as f:
+    w = csv.writer(f)
+    w.writerow(["repair_id","sub_id","user_code","reproduction","basis","ref_sub_id","repair_code","needs_internal_comment","note"])
+    for s in valid:
+        for (sid,uc,rp,bs,ref,rc) in s["claims"]:
+            w.writerow([s["id"],sid,uc,rp,bs,ref if ref else "",rc or "", "1" if s["id"]=="T028" else "", s["note"] if sid==1 else ""])
+with open(OUT/"expected_environments.csv","w",encoding="utf-8-sig",newline="") as f:
+    w = csv.writer(f); w.writerow(["repair_id","factor","source","abnormal_use","user_caused"])
+    for s in valid:
+        for fac,src,ab in s["env"]:
+            w.writerow([s["id"],fac,src,str(ab).lower(),str(ab or fac in USER_CAUSED_ALWAYS).lower()])
+with open(OUT/"expected_extra_findings.csv","w",encoding="utf-8-sig",newline="") as f:
+    w = csv.writer(f); w.writerow(["repair_id","seq","description","repair_code"])
+    for s in valid:
+        for k,(d,c) in enumerate(s["extra"],1):
+            w.writerow([s["id"],k,d,c])
+
+# 期待値: 最終出力(R-46〜R-48 を素直に計算)
+final = []
+for s in valid:
+    cl = sorted(s["claims"])
+    conf = [c for c in cl if c[2] in CONFIRMED]
+    rcodes = [c[5] for c in conf if c[5]] + [e[1] for e in s["extra"]]
+    uce = any(ab or fac in USER_CAUSED_ALWAYS for fac,_,ab in s["env"])
+    yes = (not uce) and any(c not in NON_MFR for c in rcodes)
+    rep = ""
+    if yes:
+        m = [c for c in conf if c[5] and c[5] not in NON_MFR]
+        rep = m[0][5] if m else next(e[1] for e in s["extra"] if e[1] not in NON_MFR)
+    final.append([s["id"],s["prod"],"ok",max(c[0] for c in cl),
+                  ";".join(c[1] for c in cl),";".join(c[1] for c in conf),";".join(rcodes),
+                  str(uce).lower(),"YES" if yes else "NO",rep])
+with open(OUT/"expected_final.csv","w",encoding="utf-8-sig",newline="") as f:
+    w = csv.writer(f)
+    w.writerow(["repair_id","product_type","status","failure_count","user_claim_codes","confirmed_claim_codes","repair_confirmed_codes","user_caused_env","manufacturer_repair","representative_code"])
+    w.writerows(final)
+
+# 除外の期待値
+with open(OUT/"expected_excluded.csv","w",encoding="utf-8-sig",newline="") as f:
+    w = csv.writer(f); w.writerow(["row_number","repair_id","reason"])
+    for n,s in enumerate(S,1):
+        if s["id"]=="T026": w.writerow([n,"T026","unknown_product"])
+        if s["id"]=="T027": w.writerow([n,"T001","duplicate_id"])
+
+json.dump([{k:s[k] for k in ("id","prod","pattern","aim","user","repair","i1","note")} for s in S],
+          open(OUT/"_scenarios.json","w",encoding="utf-8"),ensure_ascii=False,indent=1)
+print(len(S), "scenarios;", len(valid), "valid")
+for r in final: print(r[0], r[8], r[9], "|", r[6])

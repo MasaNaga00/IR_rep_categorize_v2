@@ -108,7 +108,7 @@ git push
 python -m pytest tests/v2 -q
 ```
 
-> 確認: 最後の行が **`155 passed`** になること(2026-11-03 時点の件数。更新で増えることがある)。
+> 確認: 最後の行が **`158 passed`** になること(2026-11-06 時点の件数。更新で増えることがある)。
 
 - 失敗した場合は、`FAILED tests/v2/test_xxx.py::test_r43_...` の行を控えて、手順11の書式で Mac 側に伝える。テスト名の `r43` は要件 ID(R-43)を表す。
 
@@ -224,10 +224,18 @@ python repclass_cli.py evaluate --gold tests\fixtures\synthetic\expected_claims.
 python repclass_cli.py run --input C:\work\repclass_local\data\sample_100.csv --local-dir C:\work\repclass_local --dry-run
 ```
 > 確認: 除外が想定より多くないこと。
-- 除外の理由は、実行フォルダの `run_meta.json` の `excluded_reasons` にある。
-  - `unknown_product`: 製品種別の値の問題
-  - `duplicate_id`: ID の重複
-  - `empty_id`: ID が空
+- 画面に、除外の内訳と、YAML にない製品種別の値が表示される(2026-11-06 追加)。
+  ```
+  除外の内訳: unknown_product 120 / duplicate_id 35(一覧: excluded_rows.csv)
+  YAML にない製品種別: 'DC'(100), 'ml'(15), 'ミラーレス'(5)  / YAML の製品ID: ML, LENS
+  ```
+- 除外された行の一覧は、実行フォルダの `excluded_rows.csv` にある(`excel_row` は Excel で開いたときの行番号)。
+
+| 理由 | 意味 | よくある原因と対処 |
+|---|---|---|
+| `unknown_product` | 製品種別の値が YAML の製品ID と一致しない | ローカルの YAML にその製品(例: DC)が無い → YAML に追加する。`'ml'`・`'ミラーレス'` のように表記が違う → 入力 CSV 側の値を直す(前後の空白は自動で取り除くので問題ない) |
+| `duplicate_id` | 同じ修理IDの2行目以降 | 元データが「1修理=1行」になっていない(部品ごとに行が分かれている等)。**最初の行だけが使われる**ので、元データの取り出し方を確認する |
+| `empty_id` | 修理IDが空 | Excel で保存したときにできた末尾の空行なら問題なし |
 
 ### 7-4. 実行する
 ```

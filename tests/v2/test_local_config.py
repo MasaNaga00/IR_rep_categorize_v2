@@ -57,6 +57,9 @@ def test_r49_cli_dry_run(tmp_path, monkeypatch, capsys):
     assert len(runs) == 1 and (runs[0] / "raw" / "batch_001_request.json").exists()
     out = capsys.readouterr().out
     assert len(out.splitlines()) <= 15   # R-57 要約は短く
+    assert "unknown_product 1" in out and "duplicate_id 1" in out   # 除外の理由別の件数
+    assert "'PRN'" in out                                          # YAML にない製品種別の値
+    assert "excluded_rows.csv" in out
 
 
 def test_r49_cli_with_injected_client(tmp_path, fake_client_factory, capsys):

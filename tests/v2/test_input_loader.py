@@ -34,7 +34,7 @@ def test_r25_empty_id_excluded(tmp_path, codebook):
     p.write_text("ID,事業コード,user_comment,repair_comment\n,ML,a,b\nX1,ML,c,d\n", encoding="utf-8")
     res = load_input(p, codebook)
     assert [r["repair_id"] for r in res.records] == ["X1"]
-    assert res.excluded == [{"row_number": 1, "repair_id": "", "reason": "empty_id"}]
+    assert res.excluded == [{"row_number": 1, "repair_id": "", "product_type": "ML", "reason": "empty_id"}]
 
 
 def test_r23_bom_and_optional_internal_columns(tmp_path, codebook):

@@ -14,10 +14,12 @@
 
 | 文書 | 内容 |
 |---|---|
+| `docs/handoff_v2/20261106_chat_handoff.md` | **開発の引き継ぎ資料**(現状・残課題・次の作業。新しいチャットで最初に読む) |
 | `docs/20261101_requirements.md` | **要件定義書(正本)**。要件 ID(R-xx) |
 | `docs/20261030_llm-classification-spec.md` | 仕様メモ(決定の経緯) |
 | `docs/handoff_v2/20261102_windows_steps_detailed.md` | Windows 側の作業手順(担当者向け) |
 | `docs/handoff_v2/20261102_windows_handoff.md` | Windows 側の作業ルール(GPT 向け) |
+| `docs/handoff_v2/20261103_ai_prompt_templates.md` | 分類の定義を AI で直すときの依頼文のひな形 |
 | `docs/dify/v2_workflow_setup.md` | Dify ワークフローの構築手順 |
 | `tests/fixtures/synthetic/README.md` | 架空テストデータのシナリオ一覧 |
 | `docs/20261101_responsibility-set.csv` | 全コードの責任区分の決定記録(2026-11-01) |
@@ -33,6 +35,7 @@ config/
   prompts/v2/system_prompt.md  Dify に貼り付けるプロンプトの初期値
 tests/v2/                    テスト(テスト名に要件 ID)
 tests/fixtures/              テスト専用のコード体系と架空データ
+tools/fixture_gen/           架空データ・テスト用 YAML の生成スクリプト(Mac 開発用)
 requirements.txt             実行に必要なライブラリ
 requirements-dev.txt         テストに必要なライブラリ
 ```

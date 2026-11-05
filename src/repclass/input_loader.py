@@ -55,14 +55,14 @@ def load_input(path: str | Path, codebook: Codebook, columns: dict | None = None
                    for k in FIELDS}
             rid = rec["repair_id"]
             if not rid:
-                res.excluded.append({"row_number": n, "repair_id": "", "reason": "empty_id"})
+                res.excluded.append({"row_number": n, "repair_id": "", "product_type": rec["product_type"], "reason": "empty_id"})
                 continue
             if rid in seen:
-                res.excluded.append({"row_number": n, "repair_id": rid, "reason": "duplicate_id"})
+                res.excluded.append({"row_number": n, "repair_id": rid, "product_type": rec["product_type"], "reason": "duplicate_id"})
                 continue
             seen.add(rid)
             if rec["product_type"] not in products:
-                res.excluded.append({"row_number": n, "repair_id": rid, "reason": "unknown_product"})
+                res.excluded.append({"row_number": n, "repair_id": rid, "product_type": rec["product_type"], "reason": "unknown_product"})
                 continue
             rec["row_number"] = n
             res.records.append(rec)

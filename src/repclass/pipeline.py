@@ -25,6 +25,7 @@ CLAIMS_COLUMNS = ["repair_id", "sub_id", "user_code", "reproduction", "basis", "
 ENV_COLUMNS = ["repair_id", "factor", "source", "abnormal_use", "user_caused", "excerpt"]
 EXTRA_COLUMNS = ["repair_id", "seq", "description", "repair_code", "excerpt"]
 ISSUE_COLUMNS = ["repair_id", "sub_id", "kind", "severity", "message"]
+EXCLUDED_COLUMNS = ["row_number", "excel_row", "repair_id", "product_type", "reason"]
 
 
 @dataclass
@@ -124,9 +125,16 @@ def run_pipeline(input_csv, *, codebook: Codebook, client, output_dir, batch_siz
         "include_internal": include_internal,
         "batch_size": batch_size,
         "excluded_reasons": dict(Counter(e["reason"] for e in loaded.excluded)),
+        # YAML にない製品種別の値と件数(2026-11-06 追加。表記ゆれ・未登録の製品の確認用)
+        "unknown_product_values": dict(Counter(e["product_type"] for e in loaded.excluded
+                                               if e["reason"] == "unknown_product").most_common()),
         "batches": len(batches),
         "retries": 0,
     }
+
+    # 除外された行の一覧(2026-11-06 追加。excel_row は見出しを含めた Excel 上の行番号)
+    write_csv(run_dir / "excluded_rows.csv", [dict(e, excel_row=e["row_number"] + 1) for e in loaded.excluded],
+              EXCLUDED_COLUMNS)
 
     if dry_run:
         for b in batches:

@@ -20,7 +20,7 @@ def test_r50_output_files(tmp_path, codebook, synth_csv, fake_client_factory):
     d = res.run_dir
     assert d == tmp_path / "out" / "20261102_120000"
     for name in ("repairs.csv", "claims.csv", "environments.csv", "extra_findings.csv", "final.csv",
-                 "error_repairs.json", "validation_issues.csv", "run_meta.json", "results.json"):
+                 "error_repairs.json", "validation_issues.csv", "run_meta.json", "results.json", "excluded_rows.csv"):
         assert (d / name).exists(), name
     assert sorted(p.name for p in (d / "raw").glob("batch_*_request.json")) == [f"batch_{i:03d}_request.json" for i in range(1, 7)]
     assert len(list((d / "raw").glob("batch_*_response.json"))) == 6
@@ -110,3 +110,28 @@ def test_r49_dry_run(tmp_path, codebook, synth_csv):
 def test_r29_batch_size_option(tmp_path, codebook, synth_csv, fake_client_factory):
     res = _run(tmp_path, codebook, synth_csv, fake_client_factory(), batch_size=40)
     assert res.meta["batches"] == 3   # ML・LENS・DC で1バッチずつ
+
+
+def test_r50_excluded_rows_file(tmp_path, codebook, synth_csv, fake_client_factory, expected_excluded):
+    """2026-11-06 追加: 除外された行の一覧を出力する。"""
+    res = _run(tmp_path, codebook, synth_csv, fake_client_factory())
+    rows = read_csv(res.run_dir / "excluded_rows.csv")
+    assert list(rows[0]) == ["row_number", "excel_row", "repair_id", "product_type", "reason"]
+    got = sorted((int(r["row_number"]), r["repair_id"], r["reason"]) for r in rows)
+    want = sorted((int(e["row_number"]), e["repair_id"], e["reason"]) for e in expected_excluded)
+    assert got == want
+    assert all(int(r["excel_row"]) == int(r["row_number"]) + 1 for r in rows)
+    assert {r["repair_id"]: r["product_type"] for r in rows}["T026"] == "PRN"
+
+
+def test_r51_unknown_product_values(tmp_path, codebook, synth_csv, fake_client_factory):
+    """2026-11-06 追加: YAML にない製品種別の値と件数を記録する。"""
+    res = _run(tmp_path, codebook, synth_csv, fake_client_factory())
+    assert res.meta["unknown_product_values"] == {"PRN": 1}
+
+
+def test_r50_excluded_rows_also_in_dry_run(tmp_path, codebook, synth_csv):
+    res = run_pipeline(synth_csv, codebook=codebook, client=None, output_dir=tmp_path / "out",
+                       dry_run=True, timestamp="20261106_050000")
+    assert len(read_csv(res.run_dir / "excluded_rows.csv")) == 2
+    assert res.meta["unknown_product_values"] == {"PRN": 1}

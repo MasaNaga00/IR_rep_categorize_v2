@@ -230,7 +230,7 @@ product_categories:
         responsibility: user_or_unknown
       D020:
         name: 画像不具合
-        description: 撮影画像の異常(線・点・ノイズ・色再現不良等)。原因部位が特定されていない画像の不具合。センサー自体の不良と判断されたものは D019、ピントの不良は D014、ゴミの写り込みは D017 / D018。
+        description: 撮影画像の異常(線・点・ノイズ・色再現不良等)。原因部位が特定されていない画像の不具合。センサー自体の不良と判断されたものは D019、ピントの不良は D014、ゴミの写り込みは D018。
         record_type: failure
         responsibility: manufacturer
       D042:

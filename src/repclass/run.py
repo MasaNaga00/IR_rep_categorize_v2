@@ -52,10 +52,24 @@ def main(argv=None, client=None) -> int:
     m = res.meta
     print(f"実行フォルダ: {res.run_dir}")
     c = m["counts"]
+
+    def excluded_summary():
+        if not c["excluded"]:
+            return
+        reasons = " / ".join(f"{k} {v}" for k, v in m["excluded_reasons"].items())
+        print(f"除外の内訳: {reasons}(一覧: excluded_rows.csv)")
+        unk = m.get("unknown_product_values") or {}
+        if unk:
+            items = list(unk.items())
+            print("YAML にない製品種別: " + ", ".join(f"{v!r}({n})" for v, n in items[:5])
+                  + (f" ...ほか {len(items) - 5} 種類" if len(items) > 5 else "")
+                  + f"  / YAML の製品ID: {', '.join(codebook.product_ids())}")
     if a.dry_run:
         print(f"dry-run: 入力 {c['input']} / 除外 {c['excluded']} / 送信予定 {c['to_run']} / バッチ {m['batches']}")
+        excluded_summary()
         return 0
     print(f"入力 {c['input']} / 除外 {c['excluded']} / ok {c['ok']} / warning {c['warning']} / error {c['error']}")
+    excluded_summary()
     print(f"メーカー責任修理 YES: {m['manufacturer_repair_yes']} / バッチ {m['batches']} / 再試行 {m['retries']} / 所要 {m['elapsed_seconds']} 秒")
     errors = [r for r in res.final_rows if r["status"] == "error"]
     if errors:

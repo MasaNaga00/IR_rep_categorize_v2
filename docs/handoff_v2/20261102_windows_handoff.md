@@ -15,6 +15,7 @@
 | `docs/dify/v2_workflow_setup.md` | Dify ワークフローの構築手順 |
 | `tests/fixtures/synthetic/README.md` | 架空テストデータのシナリオ一覧 |
 | `docs/handoff_v2/20261102_windows_steps_detailed.md` | 担当者向けの詳しい手順(確認ポイント付き) |
+| `docs/handoff_v2/20261103_ai_prompt_templates.md` | 分類の定義を AI で直すときの依頼文のひな形 |
 
 ## 1. 作業のルール(必ず守る)
 
@@ -66,7 +67,7 @@ pip install -r requirements-dev.txt
 ```
 python -m pytest tests/v2 -q
 ```
-- 期待: **155 passed**(2026-11-03 時点)。
+- 期待: **158 passed**(2026-11-06 時点)。
 - 失敗した場合は、失敗したテスト名(`test_r43_...` のように要件 ID が入っている)を第7節の書式で報告する。
 
 ### 2.4 ローカル作業フォルダの作成
@@ -122,6 +123,7 @@ python repclass_cli.py run --input <同じCSV> --local-dir C:\work\repclass_loca
 | `final.csv` | 修理単位の最終出力(Tableau 用) |
 | `claims.csv` ほか | 中間データ |
 | `validation_issues.csv` | エラーと警告の一覧 |
+| `excluded_rows.csv` | 処理対象から外した行の一覧(理由・製品種別・Excel 上の行番号) |
 | `run_meta.json` | 件数、YAML・プロンプトの版(ハッシュ値)など |
 
 ## 6. 精度評価と調整
