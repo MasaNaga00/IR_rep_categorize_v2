@@ -18,8 +18,8 @@
 | `docs/20261101_requirements.md` | **要件定義書(正本)**。要件 ID(R-xx) |
 | `docs/20261030_llm-classification-spec.md` | 仕様メモ(決定の経緯) |
 | `docs/handoff_v2/20261102_windows_steps_detailed.md` | Windows 側の作業手順(担当者向け) |
-| `docs/handoff_v2/20261102_windows_handoff.md` | Windows 側の作業ルール(GPT 向け) |
-| `docs/handoff_v2/20261103_ai_prompt_templates.md` | 分類の定義を AI で直すときの依頼文のひな形 |
+| `docs/handoff_v2/20261102_windows_handoff.md` | Windows 側の作業ルール(担当者と GPT。GPT はチャットだけで使う) |
+| `docs/handoff_v2/20261103_ai_prompt_templates.md` | 分類の定義を GPT と直すときの依頼文のひな形(ファイルはアップロードして渡し、変更は担当者が当てる) |
 | `docs/dify/v2_workflow_setup.md` | Dify ワークフローの構築手順 |
 | `tests/fixtures/synthetic/README.md` | 架空テストデータのシナリオ一覧 |
 | `docs/20261101_responsibility-set.csv` | 全コードの責任区分の決定記録(2026-11-01) |
