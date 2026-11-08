@@ -72,12 +72,20 @@ def _squash(s: str) -> str:
     return re.sub(r"\s+", "", s or "")
 
 
-def validate_result(result: dict, request_record: dict, product_id: str, codebook: Codebook) -> list[ValidationIssue]:
+def validate_result(result: dict, request_record: dict, product_id: str, codebook: Codebook,
+                    original: dict | None = None) -> list[ValidationIssue]:
+    """original: 注記を取り除く前の文({"user_comment": ..., "repair_comment": ...})。抜き出しの確認では、
+    取り除いた後の文(request_record)と取り除く前の文のどちらに含まれていてもよい(R-67)。"""
     rid = request_record["repair_id"]
     fc = int(request_record["failure_count"])
     missing = set(request_record.get("missing_numbers") or [])
-    user_txt = _squash(request_record.get("user_comment", ""))
-    rep_txt = _squash(request_record.get("repair_comment", ""))
+    original = original or {}
+    user_txts = [_squash(request_record.get("user_comment", ""))]
+    rep_txts = [_squash(request_record.get("repair_comment", ""))]
+    if original.get("user_comment"):
+        user_txts.append(_squash(original["user_comment"]))
+    if original.get("repair_comment"):
+        rep_txts.append(_squash(original["repair_comment"]))
     statuses = codebook.claim_statuses()
     envs = codebook.environment_factors(product_id)
     issues: list[ValidationIssue] = []
@@ -123,8 +131,8 @@ def validate_result(result: dict, request_record: dict, product_id: str, codeboo
             ref = c.get("ref_sub_id")
             if not isinstance(ref, int) or isinstance(ref, bool) or not 1 <= ref <= fc or ref == sub:
                 err(sub, "ref_invalid", f"ref_sub_id が不正です: {ref!r}")
-        check_excerpt(sub, c.get("user_excerpt"), user_txt)
-        check_excerpt(sub, c.get("repair_excerpt"), rep_txt)
+        check_excerpt(sub, c.get("user_excerpt"), *user_txts)
+        check_excerpt(sub, c.get("repair_excerpt"), *rep_txts)
     for e in result.get("environment") or []:
         if e.get("factor") not in envs:
             err(None, "invalid_enum", f"環境要因が不正です: {e.get('factor')!r}")
@@ -132,17 +140,17 @@ def validate_result(result: dict, request_record: dict, product_id: str, codeboo
             err(None, "invalid_enum", f"source が不正です: {e.get('source')!r}")
         if not isinstance(e.get("abnormal_use"), bool):
             err(None, "invalid_enum", f"abnormal_use は真偽値にしてください: {e.get('abnormal_use')!r}")
-        check_excerpt(None, e.get("excerpt"), user_txt + rep_txt)
+        check_excerpt(None, e.get("excerpt"), *(u + r for u in user_txts for r in rep_txts))
     for x in result.get("extra_findings") or []:
         rc = x.get("repair_code")
         if not codebook.is_valid_code(product_id, rc or ""):
             err(None, "unknown_code", f"追加の発見の repair_code がコード体系にありません: {rc!r}")
-        check_excerpt(None, x.get("excerpt"), rep_txt)
+        check_excerpt(None, x.get("excerpt"), *rep_txts)
     return issues
 
 
 def validate_batch(results: list[dict], request_records: list[dict], product_id: str,
-                   codebook: Codebook) -> tuple[dict[str, dict], list[ValidationIssue]]:
+                   codebook: Codebook, originals: dict[str, dict] | None = None) -> tuple[dict[str, dict], list[ValidationIssue]]:
     by_id: dict[str, dict] = {}
     for r in results:
         rid = r.get("repair_id")
@@ -156,5 +164,5 @@ def validate_batch(results: list[dict], request_records: list[dict], product_id:
             issues.append(ValidationIssue(rid, None, "missing_repair", "応答にこの修理の結果がありません", "error"))
             continue
         out[rid] = by_id[rid]
-        issues.extend(validate_result(by_id[rid], rr, product_id, codebook))
+        issues.extend(validate_result(by_id[rid], rr, product_id, codebook, (originals or {}).get(rid)))
     return out, issues

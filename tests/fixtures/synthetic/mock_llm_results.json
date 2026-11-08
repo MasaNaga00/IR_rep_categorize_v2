@@ -957,5 +957,158 @@
   ],
   "environment": [],
   "extra_findings": []
+ },
+ "T046": {
+  "repair_id": "T046",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "後ろのレンズの内側に水アカのようなシミが2か所ある。雨の日は持ち出さないようにしていて、使ったあとは防湿庫に入れている。",
+    "user_code": "L028",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "L028",
+    "repair_excerpt": "分解点検いたしましたところ、後玉内部に汚れの付着を確認したため、分解清掃を実施いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T047": {
+  "repair_id": "T047",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "水に濡らしたことはないが、急に電源が入らなくなった。",
+    "user_code": "M001",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M001",
+    "repair_excerpt": "電源基板に水濡れ痕・腐食を確認しました。水濡れにより、ご指摘の現象が発生していたため、電源基板を交換しました。"
+   }
+  ],
+  "environment": [
+   {
+    "factor": "water",
+    "source": "repair",
+    "abnormal_use": false,
+    "excerpt": ""
+   }
+  ],
+  "extra_findings": []
+ },
+ "T048": {
+  "repair_id": "T048",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "首から下げて歩くと、ズームロックを締めていてもズームが1cmほど勝手に伸びてしまう。店頭の同じレンズでは起きなかった。",
+    "user_code": "L009",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "L040",
+    "repair_excerpt": "製品実力の範囲内ではございますが、同一機種と比較して差異があることを確認いたしました。可能な限り関連箇所を調整いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T049": {
+  "repair_id": "T049",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "電源を入れてから撮影できるまでが遅い。",
+    "user_code": "D005",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "D049",
+    "repair_excerpt": "起動時間を測定いたしましたが、仕様の範囲内でございました。関連箇所を点検調整いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T050": {
+  "repair_id": "T050",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "センサーにゴミが付いている。",
+    "user_code": "M013",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M013",
+    "repair_excerpt": "センサー表面を清掃いたしました◾️カメラのファームウエアを最新のファームウエアに更新しました。◾️現在のシャッター回数は約1,000回です。⭐️バッテリーが劣化しております。お買い替えをお勧めいたします。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T051": {
+  "repair_id": "T051",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "①センサーにゴミが付いている。②グリップのゴムが白っぽく変色した。",
+    "user_code": "M013",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M013",
+    "repair_excerpt": "①センサー表面を清掃いたしました※作業に伴いカメラ設定を初期化しました②グリップラバーの変色を確認したため、グリップラバーを交換いたしました。◾️現在のシャッター回数は約15,000回です。◾️装着されていたレンズの防滴マウントゴムが破れていることを確認いたしました。"
+   },
+   {
+    "sub_id": 2,
+    "user_excerpt": "①センサーにゴミが付いている。②グリップのゴムが白っぽく変色した。",
+    "user_code": "M028",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M028",
+    "repair_excerpt": "①センサー表面を清掃いたしました※作業に伴いカメラ設定を初期化しました②グリップラバーの変色を確認したため、グリップラバーを交換いたしました。◾️現在のシャッター回数は約15,000回です。◾️装着されていたレンズの防滴マウントゴムが破れていることを確認いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T052": {
+  "repair_id": "T052",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "背面の液晶モニターが映らなくなった。",
+    "user_code": "M017",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M050",
+    "repair_excerpt": "ディスプレイオフセンサー部の汚れによりご指摘の現象が発生していたため、関連部の点検清掃を実施いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T053": {
+  "repair_id": "T053",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "カメラに付けるとエラーが出る。",
+    "user_code": "L012",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "L041",
+    "repair_excerpt": "レンズ側の接点に汚れを確認したため、接点を清掃いたしました。清掃後、正常に通信することを確認いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
  }
 }

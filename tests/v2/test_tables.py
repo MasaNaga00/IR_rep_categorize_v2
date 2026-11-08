@@ -26,7 +26,8 @@ def _claims(tables, rid):
 
 def test_r41_columns(tables):
     assert set(tables.repairs[0]) == {"repair_id", "product_type", "failure_count", "user_comment", "repair_comment",
-                                      "internal_1", "internal_2", "status", "error_reason"}
+                                      "internal_1", "internal_2", "status", "error_reason",
+                                      "user_comment_notes", "repair_comment_notes"}   # R-67(2026-11-08 追加)
     assert set(tables.claims[0]) == {"repair_id", "sub_id", "user_excerpt", "user_code", "reproduction", "basis",
                                      "ref_sub_id", "repair_code", "repair_excerpt", "inherited"}
     assert set(tables.environments[0]) == {"repair_id", "factor", "source", "abnormal_use", "user_caused", "excerpt"}

@@ -9,6 +9,7 @@ from datetime import datetime
 from pathlib import Path
 
 from .codebook import Codebook
+from .comment_preprocess import REMOVED_COLUMNS, PreprocessRules, apply_preprocess
 from .constants import STATUS_ERROR, STATUS_OK, STATUS_WARNING
 from .dify_client import DifyAPIError
 from .input_loader import load_input
@@ -19,7 +20,8 @@ from .outputs import read_json, write_csv, write_json
 from .tables import build_tables
 
 REPAIRS_COLUMNS = ["repair_id", "product_type", "failure_count", "status", "error_reason",
-                   "user_comment", "repair_comment", "internal_1", "internal_2"]
+                   "user_comment", "repair_comment", "internal_1", "internal_2",
+                   "user_comment_notes", "repair_comment_notes"]   # R-67(2026-11-08 追加)
 CLAIMS_COLUMNS = ["repair_id", "sub_id", "user_code", "reproduction", "basis", "ref_sub_id", "repair_code",
                   "inherited", "user_excerpt", "repair_excerpt"]
 ENV_COLUMNS = ["repair_id", "factor", "source", "abnormal_use", "user_caused", "excerpt"]
@@ -42,10 +44,11 @@ def _sha256(path: Path | None) -> str | None:
 
 
 class _Runner:
-    def __init__(self, client, codebook: Codebook, raw_dir: Path):
+    def __init__(self, client, codebook: Codebook, raw_dir: Path, originals: dict[str, dict] | None = None):
         self.client = client
         self.codebook = codebook
         self.raw_dir = raw_dir
+        self.originals = originals or {}   # 注記を取り除く前の文(抜き出しの確認用。R-67)
         self.total_tokens = 0
         self.results: dict[str, dict] = {}
         self.issues: dict[str, list[ValidationIssue]] = {}
@@ -68,7 +71,7 @@ class _Runner:
         except LLMParseError as e:
             self._fail(ids, "parse_error", str(e))
             return
-        results, issues = validate_batch(items, batch.request_records, batch.product_id, self.codebook)
+        results, issues = validate_batch(items, batch.request_records, batch.product_id, self.codebook, self.originals)
         by_rid: dict[str, list[ValidationIssue]] = {rid: [] for rid in ids}
         for i in issues:
             by_rid.setdefault(i.repair_id, []).append(i)
@@ -92,7 +95,8 @@ class _Runner:
 
 def run_pipeline(input_csv, *, codebook: Codebook, client, output_dir, batch_size: int = 10,
                  columns: dict | None = None, include_internal: bool = False, resume_from=None,
-                 dry_run: bool = False, prompt_path=None, timestamp: str | None = None) -> RunResult:
+                 dry_run: bool = False, prompt_path=None, timestamp: str | None = None,
+                 preprocess: PreprocessRules | None = None) -> RunResult:
     t0 = time.time()
     started = datetime.now()
     ts = timestamp or started.strftime("%Y%m%d_%H%M%S")
@@ -102,7 +106,12 @@ def run_pipeline(input_csv, *, codebook: Codebook, client, output_dir, batch_siz
 
     loaded = load_input(input_csv, codebook, columns)
     records = loaded.records
+    # R-64〜R-67: 注記を取り除く(preprocess が無ければ何もしない)
+    removed_rows = apply_preprocess(records, preprocess) if preprocess is not None else []
     rec_by_id = {r["repair_id"]: r for r in records}
+    originals = {r["repair_id"]: {"user_comment": r.get("user_comment_original"),
+                                  "repair_comment": r.get("repair_comment_original")}
+                 for r in records if "user_comment_original" in r or "repair_comment_original" in r}
 
     prev: dict[str, dict] = {}
     if resume_from is not None:
@@ -130,11 +139,21 @@ def run_pipeline(input_csv, *, codebook: Codebook, client, output_dir, batch_siz
                                                if e["reason"] == "unknown_product").most_common()),
         "batches": len(batches),
         "retries": 0,
+        # 注記の除去(R-67。2026-11-08 追加)
+        "preprocess": None if preprocess is None else {
+            "path": str(preprocess.path) if preprocess.path else None,
+            "sha256": preprocess.sha256,
+            "markers": preprocess.marker_codes(),
+            "apply_to": {"repair_comment": preprocess.apply_repair_comment, "user_comment": preprocess.apply_user_comment},
+            "repairs_with_notes": len({r["repair_id"] for r in removed_rows}),
+        },
     }
 
     # 除外された行の一覧(2026-11-06 追加。excel_row は見出しを含めた Excel 上の行番号)
     write_csv(run_dir / "excluded_rows.csv", [dict(e, excel_row=e["row_number"] + 1) for e in loaded.excluded],
               EXCLUDED_COLUMNS)
+    # 注記として取り除いた文の一覧(R-67。dry-run でも出力する)
+    write_csv(run_dir / "removed_notes.csv", removed_rows, REMOVED_COLUMNS)
 
     if dry_run:
         for b in batches:
@@ -146,7 +165,7 @@ def run_pipeline(input_csv, *, codebook: Codebook, client, output_dir, batch_siz
         write_json(run_dir / "run_meta.json", meta)
         return RunResult(run_dir, [], meta)
 
-    runner = _Runner(client, codebook, raw_dir)
+    runner = _Runner(client, codebook, raw_dir, originals)
     for b in batches:
         runner.call(b, f"batch_{b.batch_id:03d}")
     # R-36: エラーの修理を1件ずつ1回だけ再試行

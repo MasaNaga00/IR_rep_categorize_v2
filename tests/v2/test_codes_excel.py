@@ -51,7 +51,7 @@ def test_r60_sheets_and_headers(xlsx):
     assert ws.cell(r, _col("名称")).value == "電源不良"
     assert ws.cell(r, _col("責任区分")).value == "manufacturer"
     assert ws.cell(_row_of(ws, "M047"), _col("役割")).value == "connected_device"
-    assert ws.max_row - 1 == 49
+    assert ws.max_row - 1 == 51   # 2026-11-08: M049・M050 を追加
     assert ws.data_validations.dataValidation   # ドロップダウンがある
 
 
@@ -93,17 +93,17 @@ def test_r63_changes_and_changelog(tmp_path, yaml_copy, xlsx):
     ws = wb["ML"]
     ws.cell(_row_of(ws, "M028"), _col("責任区分")).value = "user_or_unknown"       # 変更
     ws.delete_rows(_row_of(ws, "M037"))                                          # 削除
-    ws.append(["M049", "新しいコード", "テスト用", "failure", "manufacturer", None, None, "verified"])  # 追加
+    ws.append(["M099", "新しいコード", "テスト用", "failure", "manufacturer", None, None, "verified"])  # 追加
     wb["環境要因"].cell(2, 4).value = True if wb["環境要因"].cell(2, 4).value is False else False
     wb.save(xlsx)
     res = import_codes(xlsx, yaml_copy, now="20261103_070000")
-    assert res.added == {"ML": ["M049"]}
+    assert res.added == {"ML": ["M099"]}
     assert res.changed == {"ML": ["M028"]}
     assert res.removed == {"ML": ["M037"]}
     assert res.env_changed
     cb = load_codebook(yaml_copy)
     assert not cb.is_manufacturer("ML", "M028")
-    assert cb.code("ML", "M037") is None and cb.code("ML", "M049").name == "新しいコード"
+    assert cb.code("ML", "M037") is None and cb.code("ML", "M099").name == "新しいコード"
     raw = yaml.safe_load(yaml_copy.read_text(encoding="utf-8"))
     last = raw["meta"]["changelog"][0]
     assert last["date"] == "2026-11-03" and "Excel" in last["changes"][0]

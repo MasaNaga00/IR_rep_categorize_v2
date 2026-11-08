@@ -8,7 +8,7 @@
 # =============================================================================
 
 meta:
-  version: "0.4.1"
+  version: "0.5.0"
   source: "故障分類.csv"
   created_at: "2026-04-29"
   total_codes:
@@ -22,6 +22,11 @@ meta:
     - 製品種別（ML/LENS）はSQL段階で判定済みの前提。
     - v0.2.0: ユーザ視点/修理者視点の2軸分類、reproduction_status属性を追加。
   changelog:
+    - version: "0.5.0"
+      date: "2026-11-08"
+      changes:
+        - "製品実力範囲内 M049 / L040 / D049 を追加(修理者が製品実力・規格・仕様の範囲内と判断したもの。顧客対応の調整を含む。ユーザ責任)"
+        - "外部の汚れ(清掃で解消) M050 / L041 / D050 を追加(ディスプレイオフセンサー・電気接点など、外から触れる部分の容易に拭き取れる汚れ。ユーザ責任)"
     - version: "0.4.1"
       date: "2026-11-03"
       changes:
@@ -431,6 +436,22 @@ product_categories:
         responsibility: "user_or_unknown"
         description_status: "verified"
 
+      M049:
+        name: "製品実力範囲内"
+        description: "修理者が「製品実力の範囲内」「規格内」「仕様の範囲内」「製品仕様によるもの」など、カメラの実力・規格・仕様の範囲内と判断したもの。規格より厳しい基準での差異について、顧客対応として調整・部品交換を行った場合も含む。メーカー責任の範囲外とみなす。"
+        record_type: "failure"
+        responsibility: "user_or_unknown"
+        description_status: "ai_inferred"
+        decision_rule: "「製品実力の範囲内」「規格内」「仕様の範囲内」と書かれていれば、調整・部品交換があってもこのコード"
+
+      M050:
+        name: "外部の汚れ(清掃で解消)"
+        description: "ディスプレイオフセンサー(アイセンサー)、電気接点(レンズ接点・端子など)など、外から簡単に触れられる部分の汚れが原因で現象が発生し、清掃・拭き取りだけで解消したもの。ユーザの使用中に付いた汚れとみなし、メーカー責任の範囲外とする。分解が必要な内部の汚れ、部品交換を行ったものは含めない。撮像センサー表面のゴミはM013、ファインダー表面のゴミはM015。"
+        record_type: "failure"
+        responsibility: "user_or_unknown"
+        description_status: "ai_inferred"
+        decision_rule: "外から触れる部分の汚れが原因で、清掃・拭き取りだけで解消したものはこのコード。内部の汚れ・部品交換は含めない"
+
       # --- その他/特殊コード ---
       M046:
         name: "その他"
@@ -733,6 +754,22 @@ product_categories:
         responsibility: "user_or_unknown"
         description_status: "verified"
         decision_rule: "前玉・後玉の表面のもの、または内部か表面か判断できないものはL039"
+
+      L040:
+        name: "製品実力範囲内"
+        description: "修理者が「製品実力の範囲内」「規格内」「仕様の範囲内」「製品仕様によるもの」など、レンズの実力・規格・仕様の範囲内と判断したもの。規格より厳しい基準での差異について、顧客対応として調整・部品交換を行った場合も含む。メーカー責任の範囲外とみなす。"
+        record_type: "failure"
+        responsibility: "user_or_unknown"
+        description_status: "ai_inferred"
+        decision_rule: "「製品実力の範囲内」「規格内」「仕様の範囲内」と書かれていれば、調整・部品交換があってもこのコード"
+
+      L041:
+        name: "外部の汚れ(清掃で解消)"
+        description: "レンズの電気接点など、外から簡単に触れられる部分の汚れが原因で現象(通信エラーなど)が発生し、清掃・拭き取りだけで解消したもの。ユーザの使用中に付いた汚れとみなし、メーカー責任の範囲外とする。分解が必要な内部の汚れ、部品交換を行ったものは含めない。前玉・後玉の表面のゴミ・汚れはL039。"
+        record_type: "failure"
+        responsibility: "user_or_unknown"
+        description_status: "ai_inferred"
+        decision_rule: "外から触れる部分の汚れが原因で、清掃・拭き取りだけで解消したものはこのコード。内部の汚れ・部品交換は含めない"
 
       # --- その他/特殊コード ---
       L036:
@@ -1087,6 +1124,22 @@ product_categories:
         record_type: "failure"
         responsibility: "user_or_unknown"
         description_status: "ai_inferred"
+
+      D049:
+        name: "製品実力範囲内"
+        description: "修理者が「製品実力の範囲内」「規格内」「仕様の範囲内」「製品仕様によるもの」など、カメラの実力・規格・仕様の範囲内と判断したもの。規格より厳しい基準での差異について、顧客対応として調整・部品交換を行った場合も含む。メーカー責任の範囲外とみなす。"
+        record_type: "failure"
+        responsibility: "user_or_unknown"
+        description_status: "ai_inferred"
+        decision_rule: "「製品実力の範囲内」「規格内」「仕様の範囲内」と書かれていれば、調整・部品交換があってもこのコード"
+
+      D050:
+        name: "外部の汚れ(清掃で解消)"
+        description: "ディスプレイオフセンサー(アイセンサー)、電気接点・端子など、外から簡単に触れられる部分の汚れが原因で現象が発生し、清掃・拭き取りだけで解消したもの。ユーザの使用中に付いた汚れとみなし、メーカー責任の範囲外とする。分解が必要な内部の汚れ、部品交換を行ったものは含めない。レンズ表面のゴミ・汚れはD010。"
+        record_type: "failure"
+        responsibility: "user_or_unknown"
+        description_status: "ai_inferred"
+        decision_rule: "外から触れる部分の汚れが原因で、清掃・拭き取りだけで解消したものはこのコード。内部の汚れ・部品交換は含めない"
 
       # --- その他/特殊コード ---
       D048:

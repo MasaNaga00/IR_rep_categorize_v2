@@ -134,7 +134,7 @@ def test_r16_check_codebook_cli_ng(tmp_path, capsys):
 def test_r14_repository_default_codebook_is_valid():
     """リポジトリ同梱の初期値 YAML が v2 の自動チェックを通ること(R-14、R-16)。"""
     cb = load_codebook(REPO_ROOT / "config" / "classification_codes.yaml")
-    assert cb.version == "0.4.1"
+    assert cb.version == "0.5.0"
     assert set(cb.product_ids()) >= {"ML", "LENS"}
     assert cb.code_by_role("ML", "connected_device") == "M047"
 
@@ -155,11 +155,25 @@ def test_r21_lens_surface_vs_inside():
     assert "L039" in cb.code("LENS", "L028").description
 
 
+@pytest.mark.parametrize("pid, code, name", [
+    ("ML", "M049", "製品実力範囲内"), ("LENS", "L040", "製品実力範囲内"), ("DC", "D049", "製品実力範囲内"),
+    ("ML", "M050", "外部の汚れ(清掃で解消)"), ("LENS", "L041", "外部の汚れ(清掃で解消)"), ("DC", "D050", "外部の汚れ(清掃で解消)"),
+])
+def test_r31_product_capability_and_external_dirt_codes(pid, code, name):
+    """2026-11-08 追加(Q13・Q15・Q17): 製品実力範囲内・外部の汚れはメーカー責任ではない。record_type は failure。"""
+    cb = load_codebook(REPO_ROOT / "config" / "classification_codes.yaml")
+    info = cb.code(pid, code)
+    assert info is not None and info.name == name
+    assert not cb.is_manufacturer(pid, code)
+    assert info.record_type == "failure"
+    assert info.role is None
+
+
 def test_r15_compact_camera_product():
     """2026-11-03 追加: 製品 DC(コンパクトカメラ、接頭文字 D)。"""
     cb = load_codebook(REPO_ROOT / "config" / "classification_codes.yaml")
     assert cb.product_name("DC") == "コンパクトカメラ"
-    assert len(cb.codes("DC")) == 48
+    assert len(cb.codes("DC")) == 50   # 2026-11-08: D049・D050 を追加
     assert cb.code_by_role("DC", "connected_device") == "D046"
     assert cb.code_by_role("DC", "other") == "D048"
     assert cb.code_by_role("DC", "unknown") == "D_UNK"

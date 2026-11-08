@@ -60,3 +60,12 @@ T042,1,L028,reproduced,direct,,L028,,
 T043,1,L039,reproduced,direct,,L039,,
 T044,1,D001,reproduced,direct,,D001,,
 T045,1,D020,reproduced,direct,,D010,,
+T046,1,L028,reproduced,direct,,L028,,environment は空
+T047,1,M001,reproduced,direct,,M001,,
+T048,1,L009,reproduced,direct,,L040,,
+T049,1,D005,reproduced,direct,,D049,,
+T050,1,M013,reproduced,direct,,M013,,LLM に渡すのは「センサー表面を清掃いたしました」だけ
+T051,1,M013,reproduced,direct,,M013,,
+T051,2,M028,reproduced,direct,,M028,,
+T052,1,M017,reproduced,direct,,M050,,
+T053,1,L012,reproduced,direct,,L041,,

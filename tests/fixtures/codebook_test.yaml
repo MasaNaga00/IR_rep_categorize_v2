@@ -109,6 +109,11 @@ product_categories:
         description: 背面の各種ボタン・十字キー・コントロールパッド等の操作不良。電子ダイヤル・タッチパネルは別分類。
         record_type: failure
         responsibility: manufacturer
+      M028:
+        name: ラバー変色
+        description: グリップ等のラバー部分の変色・劣化・ベタつき等。外装の経年劣化に分類。
+        record_type: failure
+        responsibility: manufacturer
       M031:
         name: 内蔵ストロボ不具合
         description: 内蔵ストロボ（フラッシュ）の発光不良、ポップアップ機構不良、調光異常等。
@@ -151,6 +156,11 @@ product_categories:
         description: カメラの設定や操作方法が原因で現象が発生しており、本体に異常がないもの。設定の解除・変更や操作の説明で解消した修理データ。部品の不具合が見つかった場合はこのコードにしない。
         record_type: failure
         responsibility: user_or_unknown
+      M050:
+        name: 外部の汚れ(清掃で解消)
+        description: ディスプレイオフセンサー(アイセンサー)、電気接点(レンズ接点・端子など)など、外から簡単に触れられる部分の汚れが原因で現象が発生し、清掃・拭き取りだけで解消したもの。ユーザの使用中に付いた汚れとみなし、メーカー責任の範囲外とする。分解が必要な内部の汚れ、部品交換を行ったものは含めない。撮像センサー表面のゴミはM013、ファインダー表面のゴミはM015。
+        record_type: failure
+        responsibility: user_or_unknown
       M_UNK:
         name: 判定不能
         description: 情報不足等で分類できない修理データ。コメントが極端に短い、内容が抽象的等の場合。
@@ -169,6 +179,16 @@ product_categories:
       L008:
         name: ズーム引掛り/作動不具合
         description: ズームリングの動作不良（重い、軽い、引っ掛かり、動かない、ザラつき等）。
+        record_type: failure
+        responsibility: manufacturer
+      L009:
+        name: ズーム自重落下
+        description: ズームリングが自重で勝手にスライドして焦点距離が変わってしまう不具合。
+        record_type: failure
+        responsibility: manufacturer
+      L012:
+        name: 通信不良/エラー表示
+        description: ボディ・レンズ間の通信エラー、レンズ認識不良、エラーメッセージ表示等。
         record_type: failure
         responsibility: manufacturer
       L028:
@@ -208,6 +228,16 @@ product_categories:
         description: 前玉・後玉など、レンズの外側の表面に付着したゴミ・汚れ・指紋等、および表面のキズ。ユーザの使用環境で付いた可能性が高く、メーカー責任の範囲外とみなす。分解が必要なレンズ内部のゴミ・キズ・汚れは L028。内部か表面か判断できない場合もこちら。
         record_type: failure
         responsibility: user_or_unknown
+      L040:
+        name: 製品実力範囲内
+        description: 修理者が「製品実力の範囲内」「規格内」「仕様の範囲内」「製品仕様によるもの」など、レンズの実力・規格・仕様の範囲内と判断したもの。規格より厳しい基準での差異について、顧客対応として調整・部品交換を行った場合も含む。メーカー責任の範囲外とみなす。
+        record_type: failure
+        responsibility: user_or_unknown
+      L041:
+        name: 外部の汚れ(清掃で解消)
+        description: レンズの電気接点など、外から簡単に触れられる部分の汚れが原因で現象(通信エラーなど)が発生し、清掃・拭き取りだけで解消したもの。ユーザの使用中に付いた汚れとみなし、メーカー責任の範囲外とする。分解が必要な内部の汚れ、部品交換を行ったものは含めない。前玉・後玉の表面のゴミ・汚れはL039。
+        record_type: failure
+        responsibility: user_or_unknown
       L_UNK:
         name: 判定不能
         description: 情報不足等で分類できない修理データ。コメントが極端に短い、内容が抽象的等の場合。
@@ -221,6 +251,11 @@ product_categories:
       D001:
         name: 電源不良
         description: 電源が入らない、起動しない等、電源系統全般の不具合。使用中にフリーズする・電源が切れるものは D003、電源ボタン自体の操作不良は D021、充電できないものは D002。
+        record_type: failure
+        responsibility: manufacturer
+      D005:
+        name: 動作不良
+        description: 特定の機能・操作が正常に動作しない包括的な分類。他の具体的な分類に該当しない動作異常。設定や操作が原因のものは D047。
         record_type: failure
         responsibility: manufacturer
       D010:
@@ -260,6 +295,11 @@ product_categories:
         record_type: failure
         responsibility: manufacturer
         role: other
+      D049:
+        name: 製品実力範囲内
+        description: 修理者が「製品実力の範囲内」「規格内」「仕様の範囲内」「製品仕様によるもの」など、カメラの実力・規格・仕様の範囲内と判断したもの。規格より厳しい基準での差異について、顧客対応として調整・部品交換を行った場合も含む。メーカー責任の範囲外とみなす。
+        record_type: failure
+        responsibility: user_or_unknown
       D_UNK:
         name: 判定不能
         description: 情報不足等で分類できない修理データ。コメントが極端に短い、内容が抽象的等の場合。

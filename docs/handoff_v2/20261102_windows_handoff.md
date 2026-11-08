@@ -36,6 +36,7 @@
 | `classification_codes.xlsx` | `codes-export` で書き出した確認・修正用の Excel |
 | `prompts/system_prompt.md` | プロンプトの調整(変更後は Dify に貼り直す) |
 | `input_columns.yaml` | 入力 CSV の列名が既定と違う場合に合わせる |
+| `comment_preprocess.yaml` | 修理者コメントから取り除く注記のマーク(◾️・⭐️・※ など)を、実データの文字に合わせる(R-64。2026-11-08 追加) |
 | `eval_name_map.csv` | 評価用の、過去の名称とコードの対応表 |
 | `.env` | Dify の接続情報(共有しない) |
 | `data\`, `outputs\` | 入力データと実行結果 |
@@ -68,7 +69,7 @@ pip install -r requirements-dev.txt
 ```
 python -m pytest tests/v2 -q
 ```
-- 期待: **158 passed**(2026-11-06 時点)。
+- 期待: **202 passed**(2026-11-08 時点)。
 - 失敗した場合は、失敗したテスト名(`test_r43_...` のように要件 ID が入っている)を第7節の書式で報告する。
 
 ### 2.4 ローカル作業フォルダの作成
@@ -92,7 +93,7 @@ python repclass_cli.py run --input tests\fixtures\synthetic\repairs.csv --local-
 python repclass_cli.py evaluate --gold tests\fixtures\synthetic\expected_claims.csv --run C:\work\repclass_local\outputs\<timestamp> --local-dir C:\work\repclass_local
 ```
 
-- 期待: 入力 45 / 除外 2 / error 0。
+- 期待: 入力 53 / 除外 2 / error 0(2026-11-08 時点)。
 - `user_code`・`reproduction`・`repair_code` の一致率を確認する。
 - 不一致は `<実行フォルダ>\evaluation\mismatches.csv` にある。該当シナリオのねらいを `tests/fixtures/synthetic/README.md` で確認し、プロンプトを調整する。
 
@@ -125,6 +126,7 @@ python repclass_cli.py run --input <同じCSV> --local-dir C:\work\repclass_loca
 | `claims.csv` ほか | 中間データ |
 | `validation_issues.csv` | エラーと警告の一覧 |
 | `excluded_rows.csv` | 処理対象から外した行の一覧(理由・製品種別・Excel 上の行番号) |
+| `removed_notes.csv` | 修理者コメントから注記として取り除いた文と、取り除いた後の文(R-67。dry-run でも出る) |
 | `run_meta.json` | 件数、YAML・プロンプトの版(ハッシュ値)など |
 
 ## 6. 精度評価と調整

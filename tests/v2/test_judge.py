@@ -22,6 +22,7 @@ def test_r46_columns():
         "user_claim_codes", "user_claim_names", "confirmed_claim_codes", "confirmed_claim_names",
         "repair_confirmed_codes", "repair_confirmed_names", "user_caused_env", "user_caused_factors",
         "manufacturer_repair", "representative_code", "representative_name",
+        "extra_finding_codes", "extra_finding_names",
     ]
 
 
@@ -46,7 +47,7 @@ def test_r46_names(final):
 @pytest.mark.parametrize("rid, yes, rep, why", [
     ("T013", "NO", "", "ファームアップで解消はメーカー責任ではない"),
     ("T034", "YES", "M007", "付随のファーム更新は処置ではない"),
-    ("T017", "YES", "M031", "追加の発見だけで YES"),
+    ("T017", "NO", "", "追加の発見は判断に使わない(2026-11-08 変更)"),
     ("T024", "NO", "", "再現したがメーカー責任でないコード"),
     ("T030", "NO", "", "前置きのショック品"),
     ("T011", "YES", "M004", "通常の使用の高温"),
@@ -61,9 +62,40 @@ def test_r46_names(final):
     ("T043", "NO", "", "内部か表面か判断できなければ表面"),
     ("T044", "YES", "D001", "コンパクトカメラのコード体系"),
     ("T045", "NO", "", "コンパクトカメラでもレンズ表面はユーザ責任"),
+    ("T046", "YES", "L028", "雨に気をつけていた(否定の文)は環境要因にしない"),
+    ("T047", "NO", "", "修理者が水濡れ痕を確認していれば、ユーザが否定していても水濡れ"),
+    ("T048", "NO", "", "製品実力の範囲内は調整していてもメーカー責任ではない"),
+    ("T049", "NO", "", "仕様の範囲内も製品実力範囲内"),
+    ("T050", "NO", "", "後付けの注記(バッテリーの劣化)は判断に使わない"),
+    ("T051", "YES", "M028", "注記の後に続く②は残る"),
+    ("T052", "NO", "", "ディスプレイオフセンサーの汚れ(清掃で解消)はユーザ責任"),
+    ("T053", "NO", "", "容易に拭き取れる接点の汚れはユーザ責任"),
 ])
 def test_r47_r48_key_cases(final, rid, yes, rep, why):
     assert (final[rid]["manufacturer_repair"], final[rid]["representative_code"]) == (yes, rep), why
+
+
+def test_r46_extra_findings_are_reference_only(final):
+    """2026-11-08 変更(Q16): 追加の発見は参考の列に残すが、repair_confirmed_codes・YES/NO・代表故障には使わない。"""
+    t017 = final["T017"]
+    assert t017["extra_finding_codes"] == "M031"
+    assert t017["extra_finding_names"] == "内蔵ストロボ不具合"
+    assert t017["repair_confirmed_codes"] == ""
+    assert (t017["manufacturer_repair"], t017["representative_code"]) == ("NO", "")
+    assert final["T001"]["extra_finding_codes"] == ""
+
+
+def test_r47_extra_finding_with_manufacturer_code_does_not_make_yes(codebook, synth_csv, mock_results):
+    """例3・例4: 注記を LLM が追加の発見(電源不良・その他)と読んでも、YES にならない。"""
+    recs = load_input(synth_csv, codebook).records
+    res = copy.deepcopy(mock_results)
+    res["T050"]["extra_findings"] = [{"description": "バッテリーの劣化", "repair_code": "M001", "excerpt": ""},
+                                     {"description": "防滴マウントゴムの破れ", "repair_code": "M046", "excerpt": ""}]
+    out = {r["repair_id"]: r for r in judge_repairs(build_tables(recs, res, {}, codebook), codebook)}
+    r = out["T050"]
+    assert r["repair_confirmed_codes"] == "M013"
+    assert r["extra_finding_codes"] == "M001;M046"
+    assert (r["manufacturer_repair"], r["representative_code"]) == ("NO", "")
 
 
 def test_r37_error_rows_have_blank_judgements(codebook, synth_csv, mock_results):
@@ -73,7 +105,7 @@ def test_r37_error_rows_have_blank_judgements(codebook, synth_csv, mock_results)
     r = out["T003"]
     assert (r["status"], r["error_reason"]) == ("error", "api_error")
     for k in ("user_claim_codes", "confirmed_claim_codes", "repair_confirmed_codes", "user_caused_factors",
-              "manufacturer_repair", "representative_code", "representative_name"):
+              "manufacturer_repair", "representative_code", "representative_name", "extra_finding_codes"):
         assert r[k] == "", k
     assert r["user_caused_env"] is None
     assert r["failure_count"] == 2

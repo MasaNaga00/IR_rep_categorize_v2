@@ -18,6 +18,7 @@
 | `docs/20261101_requirements.md` | **要件定義書(正本)**。要件 ID(R-xx) |
 | `docs/20261030_llm-classification-spec.md` | 仕様メモ(決定の経緯) |
 | `docs/handoff_v2/20261102_windows_steps_detailed.md` | Windows 側の作業手順(担当者向け) |
+| `docs/handoff_v2/20261108_windows_update_steps.md` | Windows 側の更新手順(2026-11-08 版: メーカー責任の判定の修正、注記の除去) |
 | `docs/handoff_v2/20261102_windows_handoff.md` | Windows 側の作業ルール(担当者と GPT。GPT はチャットだけで使う) |
 | `docs/handoff_v2/20261103_ai_prompt_templates.md` | 分類の定義を GPT と直すときの依頼文のひな形(ファイルはアップロードして渡し、変更は担当者が当てる) |
 | `docs/dify/v2_workflow_setup.md` | Dify ワークフローの構築手順 |
@@ -32,6 +33,7 @@ src/repclass/                プログラム本体
 config/
   classification_codes.yaml  コード体系の初期値
   input_columns.yaml         入力 CSV の列の対応づけの初期値
+  comment_preprocess.yaml    修理者コメントから取り除く注記のマークの初期値(2026-11-08 追加)
   prompts/v2/system_prompt.md  Dify に貼り付けるプロンプトの初期値
 tests/v2/                    テスト(テスト名に要件 ID)
 tests/fixtures/              テスト専用のコード体系と架空データ

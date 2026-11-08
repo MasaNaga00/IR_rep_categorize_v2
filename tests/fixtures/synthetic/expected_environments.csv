@@ -5,3 +5,4 @@ T011,heat,user,false,false
 T012,heat,both,true,true
 T023,water,both,false,true
 T030,impact,repair,true,true
+T047,water,repair,false,true

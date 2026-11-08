@@ -1,4 +1,7 @@
-"""R-46〜R-48: 最終出力(修理単位)の判断ルール。"""
+"""R-46〜R-48: 最終出力(修理単位)の判断ルール。
+
+2026-11-08 変更(Q16): 追加の発見(extra_findings)は参考の列に出すだけで、判断には使わない。
+"""
 from __future__ import annotations
 
 from .codebook import Codebook
@@ -10,6 +13,7 @@ FINAL_COLUMNS = [
     "user_claim_codes", "user_claim_names", "confirmed_claim_codes", "confirmed_claim_names",
     "repair_confirmed_codes", "repair_confirmed_names", "user_caused_env", "user_caused_factors",
     "manufacturer_repair", "representative_code", "representative_name",
+    "extra_finding_codes", "extra_finding_names",
 ]
 
 
@@ -47,7 +51,8 @@ def judge_repairs(tables: Tables, codebook: Codebook) -> list[dict]:
         xs = sorted(extras.get(rid, []), key=lambda x: x["seq"])
         user_codes = [c["user_code"] for c in cl]
         conf_codes = [c["user_code"] for c in conf]
-        repair_codes = [c["repair_code"] for c in conf if c["repair_code"]] + [x["repair_code"] for x in xs if x["repair_code"]]
+        repair_codes = [c["repair_code"] for c in conf if c["repair_code"]]
+        extra_codes = [x["repair_code"] for x in xs if x["repair_code"]]
         factors = []
         for e in envs.get(rid, []):
             if e["user_caused"] and e["factor"] not in factors:
@@ -57,11 +62,10 @@ def judge_repairs(tables: Tables, codebook: Codebook) -> list[dict]:
         rep = ""
         if yes:
             rep = next((c["repair_code"] for c in conf if c["repair_code"] and codebook.is_manufacturer(pid, c["repair_code"])), "")
-            if not rep:
-                rep = next((x["repair_code"] for x in xs if codebook.is_manufacturer(pid, x["repair_code"])), "")
         row["user_claim_codes"], row["user_claim_names"] = join(user_codes)
         row["confirmed_claim_codes"], row["confirmed_claim_names"] = join(conf_codes)
         row["repair_confirmed_codes"], row["repair_confirmed_names"] = join(repair_codes)
+        row["extra_finding_codes"], row["extra_finding_names"] = join(extra_codes)
         row["user_caused_env"] = user_caused
         row["user_caused_factors"] = SEP.join(factors)
         row["manufacturer_repair"] = "YES" if yes else "NO"

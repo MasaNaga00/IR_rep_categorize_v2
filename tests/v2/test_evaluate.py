@@ -47,7 +47,7 @@ GOLD = [
     {"repair_id": "T003", "representative_name": "ＡＦ不良"},
     {"repair_id": "T002", "representative_name": ""},
     {"repair_id": "T009", "representative_name": "電源不良"},
-    {"repair_id": "T017", "representative_name": ""},
+    {"repair_id": "T040", "representative_name": ""},   # 2026-11-08: T017 は NO になったため、こちらで YES 側のずれを確かめる
     {"repair_id": "T005", "representative_name": "ｼｬｯﾀｰ不具合"},
     {"repair_id": "T019", "representative_name": "電源ﾌﾘｮｳ(旧)"},
     {"repair_id": "T006", "representative_name": "ナゾの故障"},
@@ -63,7 +63,7 @@ def test_r55_simple(codebook, final_rows):
     assert r.n_both_yes == 4
     assert r.representative_accuracy == pytest.approx(3 / 4)
     kinds = {(m["repair_id"], m["kind"]) for m in r.mismatches}
-    assert kinds == {("T009", "gold_only"), ("T017", "pred_only"), ("T005", "code_differs")}
+    assert kinds == {("T009", "gold_only"), ("T040", "pred_only"), ("T005", "code_differs")}
     assert r.unresolved == {("ML", "ナゾの故障"): 1}
     assert r.n_missing_in_run == 1
 

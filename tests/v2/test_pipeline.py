@@ -47,7 +47,7 @@ def test_r51_run_meta(tmp_path, codebook, synth_csv, fake_client_factory):
     assert meta["input_path"] == str(synth_csv)
     assert meta["codebook_version"] == codebook.version and meta["codebook_sha256"] == codebook.sha256
     assert len(meta["prompt_sha256"]) == 64
-    assert meta["counts"] == {"input": 45, "excluded": 2, "ok": 43, "warning": 0, "error": 0}
+    assert meta["counts"] == {"input": 53, "excluded": 2, "ok": 51, "warning": 0, "error": 0}
     assert meta["excluded_reasons"] == {"unknown_product": 1, "duplicate_id": 1}
     assert meta["batches"] == 6 and meta["retries"] == 0
     assert meta["total_tokens"] == 600
@@ -76,9 +76,9 @@ def test_r36_broken_once_recovers(tmp_path, codebook, synth_csv, fake_client_fac
 
 def test_r35_r39_persistent_error_still_produces_full_output(tmp_path, codebook, synth_csv, fake_client_factory):
     res = _run(tmp_path, codebook, synth_csv, fake_client_factory(broken_ids={"T003"}))
-    assert res.meta["counts"] == {"input": 45, "excluded": 2, "ok": 42, "warning": 0, "error": 1}
+    assert res.meta["counts"] == {"input": 53, "excluded": 2, "ok": 50, "warning": 0, "error": 1}
     final = {r["repair_id"]: r for r in read_csv(res.run_dir / "final.csv")}
-    assert len(final) == 43
+    assert len(final) == 51
     assert (final["T003"]["status"], final["T003"]["error_reason"], final["T003"]["manufacturer_repair"]) == ("error", "unknown_code", "")
     err = json.loads((res.run_dir / "error_repairs.json").read_text(encoding="utf-8"))
     assert [e["repair_id"] for e in err] == ["T003"]
@@ -96,7 +96,7 @@ def test_r40_resume_reruns_only_errors(tmp_path, codebook, synth_csv, fake_clien
     assert second.meta["counts"]["error"] == 0
     assert second.meta["resume_from"] == "20261102_120000"
     final = read_csv(second.run_dir / "final.csv")
-    assert len(final) == 43 and all(r["status"] == "ok" for r in final)
+    assert len(final) == 51 and all(r["status"] == "ok" for r in final)
 
 
 def test_r49_dry_run(tmp_path, codebook, synth_csv):

@@ -109,7 +109,7 @@ git push
 python -m pytest tests/v2 -q
 ```
 
-> 確認: 最後の行が **`158 passed`** になること(2026-11-06 時点の件数。更新で増えることがある)。
+> 確認: 最後の行が **`202 passed`** になること(2026-11-08 時点の件数。更新で増えることがある)。
 
 - 失敗した場合は、`FAILED tests/v2/test_xxx.py::test_r43_...` の行を控えて、手順11の書式で Mac 側に伝える。テスト名の `r43` は要件 ID(R-43)を表す。
 
@@ -124,7 +124,7 @@ Windows 側で変更するファイル(YAML、プロンプト、接続情報、�
    python repclass_cli.py init --local-dir C:\work\repclass_local
    ```
    > 確認: 次のファイルとフォルダができていること。
-   > `classification_codes.yaml`、`input_columns.yaml`、`prompts\system_prompt.md`、`.env`、`eval_name_map.csv`、`data\`、`outputs\`
+   > `classification_codes.yaml`、`input_columns.yaml`、`prompts\system_prompt.md`、`comment_preprocess.yaml`、`.env`、`eval_name_map.csv`、`data\`、`outputs\`
    - すでにあるファイルは上書きされないので、何度実行しても安全。
 2. 毎回 `--local-dir` を付けるのが面倒な場合は、環境変数に設定しておく(任意)。
    ```
@@ -135,7 +135,7 @@ Windows 側で変更するファイル(YAML、プロンプト、接続情報、�
    ```
    python repclass_cli.py check --local-dir C:\work\repclass_local
    ```
-   > 確認: `OK: ... version=0.4.1 製品=ML(49), LENS(40), DC(48)` のように表示されること(バージョンとコード数は、YAML の更新で変わる)。
+   > 確認: `OK: ... version=0.5.0 製品=ML(51), LENS(42), DC(50)` のように表示されること(2026-11-08 時点。バージョンとコード数は、YAML の更新で変わる)。
 
 ---
 
@@ -173,13 +173,13 @@ Windows 側で変更するファイル(YAML、プロンプト、接続情報、�
 
 ## 手順6: 架空データで通しの確認をする
 
-実データの前に、架空データ(45件。うち2件は除外される想定)で、Python → Dify → 結果の作成までを通す。
+実データの前に、架空データ(53件。うち2件は除外される想定。2026-11-08 時点)で、Python → Dify → 結果の作成までを通す。
 
 ### 6-1. Dify を呼ばずに、送る内容だけを作る(dry-run)
 ```
 python repclass_cli.py run --input tests\fixtures\synthetic\repairs.csv --local-dir C:\work\repclass_local --dry-run
 ```
-> 確認: `dry-run: 入力 45 / 除外 2 / 送信予定 43 / バッチ 6`
+> 確認: `dry-run: 入力 53 / 除外 2 / 送信予定 51 / バッチ 6` と、`注記を取り除いた修理: 6 件(マーク: U+25FE, U+2B50, U+203B, U+25A0, U+2605)` が表示されること(マークは初期値の場合)
 
 ### 6-2. Dify の画面で1バッチだけ試す
 - `C:\work\repclass_local\outputs\<timestamp>\raw\batch_001_request.json` をメモ帳で開く。
@@ -190,7 +190,7 @@ python repclass_cli.py run --input tests\fixtures\synthetic\repairs.csv --local-
 ```
 python repclass_cli.py run --input tests\fixtures\synthetic\repairs.csv --local-dir C:\work\repclass_local
 ```
-> 確認: `入力 45 / 除外 2 / ok … / warning … / error 0` のように表示され、error が 0 件であること。
+> 確認: `入力 53 / 除外 2 / ok … / warning … / error 0` のように表示され、error が 0 件であること。
 - error がある場合は、表示されたエラーの種類を見て、`docs\dify\v2_workflow_setup.md` の第4節(トラブルシューティング)を確認する。
   - `api_error`: 接続設定の問題
   - `parse_error`: 出力が JSON になっていない
@@ -219,6 +219,23 @@ python repclass_cli.py evaluate --gold tests\fixtures\synthetic\expected_claims.
 ### 7-2. 列名と製品種別の値を確認する
 - 列名が `ID`、`事業コード`、`user_comment`、`repair_comment`、`Internal_1`、`Internal_2` と違う場合は、`C:\work\repclass_local\input_columns.yaml` の右側を実データの列名に書き換える。
 - 製品種別の列の値は、YAML の製品 ID(`ML`、`LENS`、`DC`)と同じである必要がある。違う値の行は「YAML にない製品」として除外される。
+
+### 7-2a. 注記のマークを実データの文字に合わせる(2026-11-08 追加)
+修理者コメントの後ろの注記(◾️ファームウエアを更新しました ⭐️バッテリーが劣化しております など)は、Dify に渡す前にプログラムが取り除く(R-64〜R-67)。取り除くマークは `C:\work\repclass_local\comment_preprocess.yaml` に書く。**Mac では実データのマークの文字を確認できないため、Windows 側で合わせる。**
+
+1. 実データの CSV を Excel で開き、マークの文字コードを調べる。例: マークが A2 セルの 15 文字目なら、空いているセルに次を入れる。
+   ```
+   =DEC2HEX(UNICODE(MID(A2,15,1)))
+   ```
+   - `25A0` と出たら ■、`2605` なら ★、`203B` なら ※、`25FE` なら ◾、`2B50` なら ⭐。
+   - `FE0F` と出た場合は、絵文字の後ろの見えない文字。1つ前の文字を調べる。
+2. `comment_preprocess.yaml` をメモ帳で開き、`note_markers:` に `- "\u25A0"` の形で足す(`\u` + 16進4桁。文字そのものは書かない)。使われていないマークは消してもよい。
+   - ファイルが無い場合(古いローカル作業フォルダ)は、`python repclass_cli.py init --local-dir C:\work\repclass_local` を実行するとコピーされる(既存のファイルは上書きしない)。
+3. dry-run(7-3)を実行し、次を確かめる。
+   - 画面の `注記を取り除いた修理: N 件` が 0 件でないこと。0 件なら `注意: ... マークの文字が実データと合っていない可能性があります` と出るので、1 からやり直す。
+   - 実行フォルダの `removed_notes.csv` を Excel で開き、`removed`(取り除いた文)に修理内容が入っていないこと、`remaining`(Dify に渡す文)に注記が残っていないことを、10件ほど確かめる。
+- 取り除く範囲は、マークから「次のマーク・次の丸数字(①〜⑳)・コメントの終わり」の手前まで。注記の後に②などが続いても、②以降は残る。
+- `CSV` の中でマークが `?` に化けている場合は、CSV を「CSV UTF-8」で保存し直す。
 
 ### 7-3. dry-run で件数を確認する
 ```

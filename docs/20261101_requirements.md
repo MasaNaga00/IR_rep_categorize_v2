@@ -6,6 +6,7 @@
 - 元になる仕様: `docs/20261030_llm-classification-spec.md`(以下「仕様メモ」)
 - 要件には ID(R-xx)を付ける。テストは対応する ID をテスト名またはコメントに書く。
 - 「要確認」と書いた項目は、ユーザの判断待ち(第11節に一覧)。
+- 2026-11-08: メーカー責任の判定の修正(5つの実データの例による)。R-31 に環境要因の否定・製品実力・外部の汚れの指示を追加(YAML 0.5.0)。修理者コメントの注記の除去(第5.1節 R-64〜R-67)を追加。追加の発見を YES/NO・代表故障の判断から外す(R-46〜R-48 を変更。Q1 の決定を変更)。決定事項 Q12〜Q17 を第11.1節に追加。
 - 2026-11-06: 除外一覧の出力(R-50、R-51)を追加。要確認事項 Q8〜Q11 を第11.2節に追加。第12節は追加の経緯で第11節より前にある(内容の順序に意味はない)。
 - 2026-11-02: v2 専用リポジトリ(IR_rep_categorize_v2)へ移行。旧方式のファイル(`src/*.py`、旧テスト、旧プロンプト等)は含まない。R-06・R-07 と YAML の「既存」の記述は、移行前の経緯として残している。旧方式専用の YAML の項目(`reproduction_statuses` 等)は削除済み。
 
@@ -51,6 +52,7 @@
 | `classification_codes.yaml` | YAML(初回はリポジトリの `config/` からコピーする) |
 | `prompts/system_prompt.md` | プロンプト(同上) |
 | `input_columns.yaml` | 列の対応づけ(同上) |
+| `comment_preprocess.yaml` | 修理者コメントから取り除く注記のマーク(R-64。2026-11-08 追加) |
 | `eval_name_map.csv` | 評価用の名称→コードの対応表(R-55a) |
 | `.env` | Dify の接続情報 |
 | `data/`, `outputs/` | 入力データ、実行結果 |
@@ -212,6 +214,23 @@ class Codebook:
   - `product_type` が YAML にない製品
 - R-26: 内部コメントは読み込んで中間データに保持するが、当面は LLM に渡さない(仕様メモ第10節)。渡すかどうかは設定で切り替えられるようにする(既定値: 渡さない)。
 
+### 5.1 修理者コメントの注記の除去(2026-11-08 追加)
+
+修理者コメントの後ろには、修理とは関係のない注記(ファームウエアの更新、シャッター回数、バッテリーの劣化、別の機器の所見など)が、決まったマークの後に書かれることがある。LLM がこれを故障や追加の発見と読まないよう、Dify に渡す前に Python で取り除く。
+
+- R-64: 取り除くマークは設定ファイル `comment_preprocess.yaml` の `note_markers` で指定する(ローカル作業フォルダ → リポジトリの `config/` の順で探す。R-05a)。
+  - マークは1文字以上の文字列。YAML では `"\u25FE"` のように `\u` の形で書くことを推奨する(エディタや文字コードの違いで化けないため)。
+  - 比べるときは、絵文字の見た目を変える見えない文字(U+FE0E、U+FE0F)を無視する。そのため `◾️` と `◾` は同じマークとして扱う。
+  - 初期値は ◾(U+25FE)、⭐(U+2B50)、※(U+203B)、■(U+25A0)、★(U+2605)。実データの文字は Windows 側で確認して設定する(Mac では実データの文字を確認できないため)。
+  - `note_markers` が空なら何も取り除かない。
+- R-65: 取り除く範囲は、マークから「次のマーク・次の丸数字(①〜⑳)・コメントの終わり」のうち最初に来るところの手前まで。丸数字で止めるのは、注記の後に番号付きの修理内容が続く場合に、それを消さないため(2026-11-08 ユーザ了承。これにより、マークごとに扱いを分ける必要はない)。
+- R-66: 対象は修理者コメント。ユーザコメントにかけるかどうかは `apply_to.user_comment` で選べる(既定: かけない)。内部コメントにはかけない。
+- R-67: 取り除いた文は捨てない。
+  - `repairs.csv` の `repair_comment` / `user_comment` は入力どおりの全文とし、取り除いた文を `repair_comment_notes` / `user_comment_notes` に ` | ` 区切りで出力する。
+  - Dify に渡すのは取り除いた後の文(R-30)。抜き出しの確認(R-34 `excerpt_not_found`)は、取り除いた後の文と入力どおりの全文のどちらに含まれていてもよい。
+  - 実行フォルダに `removed_notes.csv`(列: row_number、excel_row、repair_id、field、removed、remaining。取り除いた文と、取り除いた後の文)を出力する。dry-run でも出力する(Windows 側でマークの設定を確かめるため)。
+  - `run_meta.json` に、使った設定ファイルのパス・sha256・マーク(`U+25FE` の形)・注記を取り除いた修理の件数を記録する。実行時の要約(dry-run を含む)に、注記を取り除いた修理の件数とマークを表示する。マークが設定されているのに1件も取り除かれなかった場合は、マークの文字が実データと合っていない可能性がある旨を表示する。
+
 ## 6. 故障数(Python)
 
 - R-27: `count_failures(user_comment: str) -> FailureCountResult` を提供する。
@@ -235,6 +254,7 @@ class Codebook:
  "user_comment": "...", "repair_comment": "..."}
 ```
 
+- `user_comment` / `repair_comment` は、注記を取り除いた後の文(R-64〜R-67)。
 - プロンプト本文は `config/prompts/v2/system_prompt.md` で管理し、Dify に貼り付ける。判断ルールはプロンプトに固定し、コード一覧だけを変数で渡す(仕様メモ第16.2節)。
 
 ### 7.2 プロンプトに含める判断の指示
@@ -278,6 +298,18 @@ class Codebook:
 - その後に続く「設定を解除後動作点検いたしましたが、異常はございませんでした」は、設定を直した後の確認結果なので `not_reproduced` の根拠にしない。
 - 背景: 実データで、設定が原因の修理が「動作不良」「その他」(どちらもメーカー責任)に分類され、誤って YES になっていた。
 
+**製品実力の範囲内の場合(2026-11-08 追記)**
+- 修理者が「製品実力の範囲内」「規格内」「仕様の範囲内」「製品仕様によるもの」など、製品の実力・規格・仕様の範囲内と書いている番号は、`reproduced` とし、修理者視点コードを「製品実力範囲内」(ML: M049、LENS: L040、DC: D049。responsibility は `user_or_unknown`、record_type は `failure`)にする。
+- その後に調整・部品交換が書かれていても(規格より厳しい範囲での顧客対応として行ったもの)、不具合のコードにしない。
+- `reproduced` とする理由: 現象(同一機種との差異など)は確認できているため。repair_code がユーザ責任のコードなので、YES/NO は NO になる。
+- 背景: 実データで、「製品実力の範囲内ではございますが、同一機種と比較して差異があることを確認いたしました。可能な限り関連箇所を調整いたしました。」がメーカー責任(ズーム自重落下)になっていた。
+
+**外から触れる部分の汚れ(2026-11-08 追記)**
+- ディスプレイオフセンサー(アイセンサー)、カメラ・レンズの電気接点など、外から簡単に触れられる部分の汚れが原因で現象が発生し、清掃・拭き取りだけで解消した場合は、`reproduced` とし、修理者視点コードを「外部の汚れ(清掃で解消)」(ML: M050、LENS: L041、DC: D050。responsibility は `user_or_unknown`)にする。表示の不具合・通信エラーなどのコードにしない。
+- 分解が必要な内部の汚れ、部品交換を行ったもの、清掃しても解消しなかったものは含めない。撮像センサー表面のゴミ(M013)、ファインダー表面(M015)、レンズ表面(L039 / D010)は、それぞれのコードを使う。
+- 考え方: 容易に拭き取れる汚れは、ユーザの使用中に付いたものとみなす(2026-11-08 ユーザ決定)。
+- 背景: 実データで、「ディスプレイオフセンサー部の汚れによりご指摘の現象が発生したため、関連部の点検清掃を実施いたしました」が LCD 表示不具合(メーカー責任)になっていた。
+
 **付随作業(2026-11-02 追記)**
 - 「※作業に伴いカメラ設定を初期化しました」「※最新ファームウエアに更新しました」のような、修理に付随して行った作業は**処置とみなさない**。修理者視点コードをファームアップ(サービスコード)にしない。
 - ファームウエアの更新**そのもの**で症状が改善したと書かれている場合だけ、ファームアップのコードにする。
@@ -301,6 +333,10 @@ class Codebook:
 **環境要因**
 - 記述があるものだけを出力する。
 - 通常では考えづらい使用かどうかを `abnormal_use` に入れる。
+- その環境に実際にさらされた・その取り扱いが実際にあったと書かれているものだけを出力する(2026-11-08 追記)。
+  - 「雨に当たらないよう気をつけていた」「落としたことはない」「防湿庫で保管していた」のような、否定している文や気をつけていたという文は環境要因にしない。
+  - ただし、修理者が水濡れ痕・腐食・衝撃痕など、その環境にさらされた跡を確認している場合は、ユーザが否定していても環境要因とする(source は `repair`。2026-11-08 ユーザ決定)。
+  - 背景: 実データで、「なるべく雨に当たらないよう丁寧に扱っており」の「雨」から水濡れ(常にユーザ起因)と判定され、誤って NO になっていた。
 
 **抜き出し(excerpt)**
 - 原文からそのまま抜き出す。要約や言い換えはしない。
@@ -358,7 +394,7 @@ class Codebook:
 | `missing_repair` | 結果に含まれない `repair_id` がある | エラー |
 | `parse_error` | 応答が JSON として読めない | エラー(バッチ内の全修理) |
 | `api_error` | Dify の呼び出しに失敗した(R-47 のリトライ後) | エラー(バッチ内の全修理) |
-| `excerpt_not_found` | 抜き出しが原文に含まれない(空白の違いは無視する) | 警告 |
+| `excerpt_not_found` | 抜き出しが原文に含まれない(空白の違いは無視する。注記を取り除く前・後のどちらの文に含まれていてもよい。R-67) | 警告 |
 | `ref_cycle` | 同原因の参照が循環している | 警告 |
 
 ### 7.5 エラー時の動作
@@ -388,7 +424,7 @@ class Codebook:
 
 | 表 | 列 |
 |---|---|
-| repairs(修理表) | `repair_id`, `product_type`, `failure_count`, `user_comment`, `repair_comment`, `internal_1`, `internal_2`, `status`, `error_reason` |
+| repairs(修理表) | `repair_id`, `product_type`, `failure_count`, `user_comment`, `repair_comment`, `internal_1`, `internal_2`, `status`, `error_reason`, `user_comment_notes`, `repair_comment_notes`(R-67。2026-11-08 追加) |
 | claims(申告表) | `repair_id`, `sub_id`, `user_excerpt`, `user_code`, `reproduction`, `basis`, `ref_sub_id`, `repair_code`, `repair_excerpt`, `inherited`(真偽値) |
 | environments(環境要因表) | `repair_id`, `factor`, `source`, `abnormal_use`, `user_caused`, `excerpt` |
 | extra_findings(追加の発見表) | `repair_id`, `seq`, `description`, `repair_code`, `excerpt` |
@@ -418,23 +454,24 @@ class Codebook:
 | `repair_id`, `product_type`, `failure_count`, `status`, `error_reason` | |
 | `user_claim_codes` | claims の `user_code` を番号順に `;` で連結(`NO_CLAIM` を含む) |
 | `confirmed_claim_codes` | 確認できた行の `user_code` |
-| `repair_confirmed_codes` | 確認できた行の `repair_code`(空を除く)+ extra_findings の `repair_code`(2026-11-02 確定、Q1) |
+| `repair_confirmed_codes` | 確認できた行の `repair_code`(空を除く)。2026-11-08 変更: extra_findings の `repair_code` は含めない(Q16)。2026-11-02 の決定(Q1)では含めていた |
 | `user_caused_env` | ユーザ起因の環境要因があるか(真偽値) |
 | `user_caused_factors` | ユーザ起因の要因を `;` で連結 |
 | `manufacturer_repair` | `YES` / `NO`(R-47) |
 | `representative_code` | 代表故障(R-48) |
 | `representative_name` | 代表故障のコード名 |
+| `extra_finding_codes`, `extra_finding_names` | 参考: extra_findings の `repair_code` と名称(seq 順)。判断には使わない(2026-11-08 追加) |
 
 - 名称の列(`user_claim_names` など)も、コード名を YAML から引いて同じ順に並べて出力する。
 
 - R-47(メーカー責任修理を含むか):
   1. `user_caused_env` が真 → `NO`
-  2. `repair_confirmed_codes` のうち、`is_manufacturer` が真のものが1つでもある → `YES`
+  2. `repair_confirmed_codes`(確認できた行の `repair_code`。extra_findings は含めない)のうち、`is_manufacturer` が真のものが1つでもある → `YES`
   3. それ以外 → `NO`
 - R-48(代表故障):
   1. 確認できた行のうち、`repair_code` がメーカー責任の行の中で、`sub_id` が最小の行の `repair_code`
-  2. 1 が無く、`manufacturer_repair` が `YES` の場合は、extra_findings のうちメーカー責任の最初(`seq` 最小)の `repair_code`
-  3. `manufacturer_repair` が `NO` の場合は空
+  2. `manufacturer_repair` が `NO` の場合は空
+  - 2026-11-08 変更: 旧 2(extra_findings から代表故障を取る)を削除した。修理者が見つけた故障は、ユーザコメントに「ご指摘外の現象」として書かれ、claims の行として扱われるため(Q16)。
 
 ## 9. 実行と出力ファイル
 
@@ -458,6 +495,7 @@ python -m repclass.run --input data/xxx.csv [--local-dir <path>]
 | `error_repairs.json` | エラーの修理の入力(再実行用) |
 | `validation_issues.csv` | R-34 の問題の一覧 |
 | `excluded_rows.csv` | 処理対象から外した行の一覧(R-25。列: row_number、excel_row、repair_id、product_type、reason)。dry-run でも出力する(2026-11-06 追加) |
+| `removed_notes.csv` | 注記として取り除いた文の一覧(R-67)。dry-run でも出力する(2026-11-08 追加) |
 | `run_meta.json` | 実行メタ情報(R-51) |
 
 - R-51: `run_meta.json` には次を記録する。
@@ -466,6 +504,7 @@ python -m repclass.run --input data/xxx.csv [--local-dir <path>]
   - 件数(入力・除外・ok・warning・error)、除外の理由別の件数
   - YAML にない製品種別の値と件数(`unknown_product_values`。2026-11-06 追加)。実行時の要約にも、除外の内訳と YAML にない製品種別の値(上位5種類)を表示する(R-57)
   - バッチ数、再試行の件数、所要時間、トークン数(Dify が返す場合)
+  - 注記の除去の設定(パス・sha256・マーク)と、注記を取り除いた修理の件数(R-67。2026-11-08 追加)
 - R-52: Dify の接続情報は、`.env` の `DIFY_BASE_URL`、`DIFY_API_KEY` から読む。社内の証明書は `REQUESTS_CA_BUNDLE` で指定できるようにする。
 - R-53: Dify の呼び出しは、タイムアウト・5xx・接続エラーのときに最大3回リトライする(指数バックオフ)。401/403 はリトライしない。
 
@@ -562,7 +601,7 @@ python -m repclass.run --input data/xxx.csv [--local-dir <path>]
 
 | 項目 | 決定 |
 |---|---|
-| Q1 修理者が確認した故障内容 | 確認できた行(再現・一部再現)の `repair_code` + 追加の発見のみ。YES/NO と代表故障もこれを対象にする(R-46〜R-48) |
+| Q1 修理者が確認した故障内容 | 確認できた行(再現・一部再現)の `repair_code` + 追加の発見のみ。YES/NO と代表故障もこれを対象にする(R-46〜R-48)。**2026-11-08 変更: 追加の発見は含めない(Q16)** |
 | Q2 「ご指摘外の現象」 | ユーザコメント側に、修理者が見つけた故障として書かれたもの。`reproduced` として扱う(R-31) |
 | Q3 雨による水濡れ | 案A。水濡れは常にユーザ起因とする(R-17) |
 | Q4 確信度 | 出力させない(R-32) |
@@ -572,6 +611,17 @@ python -m repclass.run --input data/xxx.csv [--local-dir <path>]
 | Q5 過去の分類結果 | 名称で入っており、表記が少し違う。正規化と対応表でコードに変換する(R-55a)。メーカー責任でない修理は空欄。代表故障は修理者確認後の内容 |
 | Q6 エラーの自動再試行 | 1件ずつ1回だけ再試行する(R-36) |
 | Q7 Windows 側への更新 | GitHub から全体をダウンロードする。上書きを防ぐため、Windows 側で変更するファイルはコードとは別のローカル作業フォルダに置く(R-05a) |
+
+### 11.1a 決定済み(2026-11-08、実データの5つの例への対応)
+
+| 項目 | 決定 |
+|---|---|
+| Q12 環境要因の否定 | 否定・気をつけていたという文は環境要因にしない。修理者が痕跡(水濡れ痕など)を確認していれば、ユーザが否定していても環境要因とする(R-31) |
+| Q13 製品実力 | 新コード「製品実力範囲内」M049 / L040 / D049(ユーザ責任、record_type は failure)。「製品実力の範囲内」に加え、「規格内」「仕様の範囲内」「製品仕様によるもの」なども対象(R-31) |
+| Q14 注記の除去 | マークから次のマーク・次の丸数字の手前まで取り除く。マークごとに扱いを分けない。実データのマークの文字は Windows 側で設定する(R-64〜R-67) |
+| Q15 外部の汚れ | 新コード「外部の汚れ(清掃で解消)」M050 / L041 / D050(ユーザ責任)。ディスプレイオフセンサーに加え、容易に拭き取れる接点の汚れも対象(R-31) |
+| Q16 追加の発見 | LLM には今までどおり出させ、`extra_findings.csv` と final.csv の参考の列に残すが、YES/NO・代表故障・`repair_confirmed_codes` には使わない(R-46〜R-48。Q1 の決定を変更) |
+| Q17 製品実力のコードの record_type | failure(現象自体はあったため) |
 
 ### 11.2 要確認(2026-11-06 更新)
 

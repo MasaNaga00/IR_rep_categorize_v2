@@ -79,9 +79,13 @@ def build_tables(records: list[dict], results: dict[str, dict], errors: dict[str
         fc = count_failures(rec.get("user_comment"))
         row = {
             "repair_id": rid, "product_type": pid, "failure_count": fc.failure_count,
-            "user_comment": rec.get("user_comment", ""), "repair_comment": rec.get("repair_comment", ""),
+            # 入力どおりの全文と、注記として取り除いた文(R-67)
+            "user_comment": rec.get("user_comment_original", rec.get("user_comment", "")),
+            "repair_comment": rec.get("repair_comment_original", rec.get("repair_comment", "")),
             "internal_1": rec.get("internal_1", ""), "internal_2": rec.get("internal_2", ""),
             "status": STATUS_OK, "error_reason": "",
+            "user_comment_notes": rec.get("user_comment_notes", ""),
+            "repair_comment_notes": rec.get("repair_comment_notes", ""),
         }
         t.repairs.append(row)
         if rid in errors or rid not in results:

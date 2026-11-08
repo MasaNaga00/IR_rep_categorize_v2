@@ -14,6 +14,7 @@ DEFAULTS = {
     "classification_codes.yaml": REPO_ROOT / "config" / "classification_codes.yaml",
     "input_columns.yaml": REPO_ROOT / "config" / "input_columns.yaml",
     "prompts/system_prompt.md": REPO_ROOT / "config" / "prompts" / "v2" / "system_prompt.md",
+    "comment_preprocess.yaml": REPO_ROOT / "config" / "comment_preprocess.yaml",   # R-64(2026-11-08 追加)
 }
 ENV_TEMPLATE = """# Dify の接続情報(このファイルは共有しないこと)
 DIFY_BASE_URL=https://your-dify-host/v1
@@ -30,6 +31,7 @@ class ResolvedPaths:
     codebook: Path
     columns: Path
     prompt: Path
+    preprocess: Path
     env_file: Path
     outputs_dir: Path
     name_map: Path | None
@@ -42,7 +44,7 @@ def _local(local_dir) -> Path | None:
     return Path(v) if v else None
 
 
-def resolve_paths(local_dir=None, codebook=None, columns=None, prompt=None) -> ResolvedPaths:
+def resolve_paths(local_dir=None, codebook=None, columns=None, prompt=None, preprocess=None) -> ResolvedPaths:
     """設定ファイルを、明示指定 → ローカル作業フォルダ → リポジトリの初期値 の順で探す。"""
     local = _local(local_dir)
 
@@ -59,6 +61,7 @@ def resolve_paths(local_dir=None, codebook=None, columns=None, prompt=None) -> R
         codebook=pick(codebook, "classification_codes.yaml"),
         columns=pick(columns, "input_columns.yaml"),
         prompt=pick(prompt, "prompts/system_prompt.md"),
+        preprocess=pick(preprocess, "comment_preprocess.yaml"),
         env_file=(local / ".env") if local is not None else REPO_ROOT / ".env",
         outputs_dir=(local / "outputs") if local is not None else REPO_ROOT / "outputs" / "v2",
         name_map=name_map if name_map is not None and name_map.exists() else None,

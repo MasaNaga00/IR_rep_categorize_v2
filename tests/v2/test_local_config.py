@@ -14,6 +14,7 @@ def test_r05a_defaults_without_local_dir(monkeypatch):
     assert p.codebook == REPO_ROOT / "config" / "classification_codes.yaml"
     assert p.columns == REPO_ROOT / "config" / "input_columns.yaml"
     assert p.prompt == REPO_ROOT / "config" / "prompts" / "v2" / "system_prompt.md"
+    assert p.preprocess == REPO_ROOT / "config" / "comment_preprocess.yaml"   # 2026-11-08 追加(R-64)
     assert p.outputs_dir == REPO_ROOT / "outputs" / "v2"
     assert p.env_file == REPO_ROOT / ".env"
 
@@ -22,7 +23,7 @@ def test_r05a_init_local_copies_without_overwrite(tmp_path):
     local = tmp_path / "local"
     created = init_local(local)
     for rel in ("classification_codes.yaml", "input_columns.yaml", "prompts/system_prompt.md",
-                ".env", "eval_name_map.csv", "data", "outputs"):
+                "comment_preprocess.yaml", ".env", "eval_name_map.csv", "data", "outputs"):
         assert (local / rel).exists(), rel
     assert len(created) >= 7
     (local / "classification_codes.yaml").write_text("# edited", encoding="utf-8")
@@ -43,6 +44,9 @@ def test_r05a_resolution_order(tmp_path, monkeypatch):
     assert resolve_paths(codebook=explicit).codebook == explicit
     (local / "input_columns.yaml").unlink()
     assert resolve_paths().columns == REPO_ROOT / "config" / "input_columns.yaml"
+    assert resolve_paths().preprocess == local / "comment_preprocess.yaml"
+    (local / "comment_preprocess.yaml").unlink()   # 古いローカル作業フォルダ(ファイルが無い)でも初期値で動く
+    assert resolve_paths().preprocess == REPO_ROOT / "config" / "comment_preprocess.yaml"
 
 
 def test_r49_cli_dry_run(tmp_path, monkeypatch, capsys):
