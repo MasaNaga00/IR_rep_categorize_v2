@@ -8,7 +8,7 @@
 # =============================================================================
 
 meta:
-  version: "0.5.0"
+  version: "0.5.1"
   source: "故障分類.csv"
   created_at: "2026-04-29"
   total_codes:
@@ -22,6 +22,11 @@ meta:
     - 製品種別（ML/LENS）はSQL段階で判定済みの前提。
     - v0.2.0: ユーザ視点/修理者視点の2軸分類、reproduction_status属性を追加。
   changelog:
+    - version: "0.5.1"
+      date: "2026-11-08"
+      changes:
+        - "LENS に動作不良 L042(メーカー責任)を追加(他の具体的な分類に当てはまらないレンズの動作異常)"
+        - "説明文の書き足し: L006(スイッチ自体の不具合に限る)、M011(カード側が原因のものは除く)、M047(メモリーカード自体の不良を含む)、M026 / D028(AF-ONボタン・マルチコントローラー、ボタン類のゴム・カバーの破損・外れを含む)"
     - version: "0.5.0"
       date: "2026-11-08"
       changes:
@@ -151,7 +156,7 @@ product_categories:
 
       M011:
         name: "メディア不具合"
-        description: "メモリーカード関連の不具合（認識不良、書き込みエラー、データ破損、スロット不良等）。"
+        description: "メモリーカード関連の不具合（認識不良、書き込みエラー、データ破損、スロット不良等）で、カメラ本体側に原因があるもの。カード自体の不良で本体に異常が無い場合はM047（接続機器要因）、カードの使い方（空き容量不足、フォーマットの推奨など）が原因の場合はM048（設定・操作起因）。"
         record_type: "failure"
         responsibility: "manufacturer"
         description_status: "ai_inferred"
@@ -276,7 +281,7 @@ product_categories:
 
       M026:
         name: "背面操作部不具合"
-        description: "背面の各種ボタン・十字キー・コントロールパッド等の操作不良。電子ダイヤル・タッチパネルは別分類。"
+        description: "背面の各種ボタン・十字キー・コントロールパッド、AF-ONボタン、マルチコントローラー（スマートコントローラー）等の操作不良、およびこれらのボタン類のゴム・カバーの破損・欠損・外れ。電子ダイヤル・タッチパネルは別分類。"
         record_type: "failure"
         responsibility: "manufacturer"
         description_status: "ai_inferred"
@@ -422,7 +427,7 @@ product_categories:
       # --- 接続機器要因 ---
       M047:
         name: "接続機器要因"
-        description: "接続したレンズ・アクセサリー等の側に原因があり、本体には異常がないと判断された修理データ。"
+        description: "接続したレンズ・アクセサリー・メモリーカード等の側に原因があり、本体には異常がないと判断された修理データ。メモリーカード自体の不良を含む。カードの使い方が原因の場合はM048。"
         record_type: "failure"
         role: "connected_device"
         responsibility: "user_or_unknown"
@@ -516,7 +521,7 @@ product_categories:
 
       L006:
         name: "SW作動不具合"
-        description: "AF/MF切替スイッチ、ISスイッチ等のレンズ側スイッチ類の動作不良。"
+        description: "AF/MF切替スイッチ、ISスイッチ等のレンズ側スイッチ類そのものの不具合（スイッチを操作しても切り替わらない、感触の異常、固着、破損等）。スイッチを操作していないのにAF/MFなどの表示や設定が切り替わるものは含めない（原因が特定されていなければL042）。"
         record_type: "failure"
         responsibility: "manufacturer"
         description_status: "ai_inferred"
@@ -771,6 +776,13 @@ product_categories:
         description_status: "ai_inferred"
         decision_rule: "外から触れる部分の汚れが原因で、清掃・拭き取りだけで解消したものはこのコード。内部の汚れ・部品交換は含めない"
 
+      L042:
+        name: "動作不良"
+        description: "レンズの特定の機能・操作が正常に動作しない包括的な分類。他の具体的な分類に該当しない動作異常（例: スイッチを操作していないのにAF/MFの表示が切り替わる）。スイッチそのものの不具合はL006、通信エラーの表示はL012。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+
       # --- その他/特殊コード ---
       L036:
         name: "その他"
@@ -985,7 +997,7 @@ product_categories:
 
       D028:
         name: "背面操作部不具合"
-        description: "背面の各種ボタン・十字キー等の操作不良。ダイヤル・ズームレバー・タッチパネルは別分類。"
+        description: "背面の各種ボタン・十字キー等の操作不良、およびこれらのボタン類のゴム・カバーの破損・欠損・外れ。ダイヤル・ズームレバー・タッチパネルは別分類。"
         record_type: "failure"
         responsibility: "manufacturer"
         description_status: "ai_inferred"

@@ -70,6 +70,11 @@ def test_r46_names(final):
     ("T051", "YES", "M028", "注記の後に続く②は残る"),
     ("T052", "NO", "", "ディスプレイオフセンサーの汚れ(清掃で解消)はユーザ責任"),
     ("T053", "NO", "", "容易に拭き取れる接点の汚れはユーザ責任"),
+    ("T054", "YES", "L042", "スイッチを操作していない表示の切り替わりは動作不良"),
+    ("T055", "NO", "", "SDカードの使い方が原因なら設定・操作起因"),
+    ("T056", "NO", "", "SDカード自体の不良なら接続機器要因"),
+    ("T057", "YES", "M026", "AF-ONボタンのゴム欠損は背面操作部不具合"),
+    ("T058", "YES", "M021", "修理者が電源スイッチ部と書いていれば電源SW不具合"),
 ])
 def test_r47_r48_key_cases(final, rid, yes, rep, why):
     assert (final[rid]["manufacturer_repair"], final[rid]["representative_code"]) == (yes, rep), why

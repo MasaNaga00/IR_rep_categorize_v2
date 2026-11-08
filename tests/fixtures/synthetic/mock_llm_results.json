@@ -1110,5 +1110,110 @@
   ],
   "environment": [],
   "extra_findings": []
+ },
+ "T054": {
+  "repair_id": "T054",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "カメラに付けた状態でレンズの付け根を動かすと、AF/MFの表示が勝手に切り替わる。",
+    "user_code": "L042",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "L042",
+    "repair_excerpt": "ご指摘の症状を確認いたしました。今回製品交換を実施いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T055": {
+  "repair_id": "T055",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "①電源を入れてから使えるまでが遅い。②撮った画像の再生が遅い。",
+    "user_code": "M003",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M048",
+    "repair_excerpt": "①②お預かりしたSDカード要因によりご指摘の現象が発生していることを確認いたしました。発生要因といたしまして、カード内の画像情報が多く、空き容量が少ない場合、カメラ内の処理に負荷がかかるため、動作が遅くなる場合がございます。適度にバックアップを取りフォーマットしてご利用いただくことをお勧めいたします。"
+   },
+   {
+    "sub_id": 2,
+    "user_excerpt": "①電源を入れてから使えるまでが遅い。②撮った画像の再生が遅い。",
+    "user_code": "M003",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M048",
+    "repair_excerpt": "①②お預かりしたSDカード要因によりご指摘の現象が発生していることを確認いたしました。発生要因といたしまして、カード内の画像情報が多く、空き容量が少ない場合、カメラ内の処理に負荷がかかるため、動作が遅くなる場合がございます。適度にバックアップを取りフォーマットしてご利用いただくことをお勧めいたします。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T056": {
+  "repair_id": "T056",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "メモリーカードに書き込めないことがある。",
+    "user_code": "M011",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M047",
+    "repair_excerpt": "お預かりしたSDカードの不良により、ご指摘の現象が発生していることを確認いたしました。カメラ本体には異常はございませんでした。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T057": {
+  "repair_id": "T057",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "マルチコントローラーの防滴ゴムが外れている。",
+    "user_code": "M026",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M026",
+    "repair_excerpt": "AF-ONボタン部のゴム欠損を確認したため、不具合箇所を含む部品【カバーユニット（バック）】を交換いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T058": {
+  "repair_id": "T058",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "①電源を切ろうとしても、画面が一瞬消えてまた表示され、切れない。②電源スイッチをOFFにして押さえている間は切れるが、指を離すとまた入ってしまう。",
+    "user_code": "M001",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M021",
+    "repair_excerpt": "①②電源スイッチ部の不具合によりご指摘の現象が発生していたため、不具合箇所を含む部品【カバーユニット（上）】を交換いたしました。"
+   },
+   {
+    "sub_id": 2,
+    "user_excerpt": "①電源を切ろうとしても、画面が一瞬消えてまた表示され、切れない。②電源スイッチをOFFにして押さえている間は切れるが、指を離すとまた入ってしまう。",
+    "user_code": "M021",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M021",
+    "repair_excerpt": "①②電源スイッチ部の不具合によりご指摘の現象が発生していたため、不具合箇所を含む部品【カバーユニット（上）】を交換いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
  }
 }

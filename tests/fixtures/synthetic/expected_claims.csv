@@ -69,3 +69,10 @@ T051,1,M013,reproduced,direct,,M013,,
 T051,2,M028,reproduced,direct,,M028,,
 T052,1,M017,reproduced,direct,,M050,,
 T053,1,L012,reproduced,direct,,L041,,
+T054,1,L042,reproduced,direct,,L042,,修理者が部位を書いていないので、現象のコード
+T055,1,M003,reproduced,direct,,M048,,
+T055,2,M003,reproduced,direct,,M048,,
+T056,1,M011,reproduced,direct,,M047,,
+T057,1,M026,reproduced,direct,,M026,,
+T058,1,M001,reproduced,direct,,M021,,まとめ書きでも、部位に対応するコードがあればそのコード(T004・T007 は対応するコードが無い部位なので、各番号のユーザ視点コード)
+T058,2,M021,reproduced,direct,,M021,,

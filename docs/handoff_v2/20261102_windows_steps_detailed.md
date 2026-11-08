@@ -109,7 +109,7 @@ git push
 python -m pytest tests/v2 -q
 ```
 
-> 確認: 最後の行が **`202 passed`** になること(2026-11-08 時点の件数。更新で増えることがある)。
+> 確認: 最後の行が **`208 passed`** になること(2026-11-08 時点の件数。更新で増えることがある)。
 
 - 失敗した場合は、`FAILED tests/v2/test_xxx.py::test_r43_...` の行を控えて、手順11の書式で Mac 側に伝える。テスト名の `r43` は要件 ID(R-43)を表す。
 
@@ -135,7 +135,7 @@ Windows 側で変更するファイル(YAML、プロンプト、接続情報、�
    ```
    python repclass_cli.py check --local-dir C:\work\repclass_local
    ```
-   > 確認: `OK: ... version=0.5.0 製品=ML(51), LENS(42), DC(50)` のように表示されること(2026-11-08 時点。バージョンとコード数は、YAML の更新で変わる)。
+   > 確認: `OK: ... version=0.5.1 製品=ML(51), LENS(43), DC(50)` のように表示されること(2026-11-08 時点。バージョンとコード数は、YAML の更新で変わる)。
 
 ---
 
@@ -173,13 +173,13 @@ Windows 側で変更するファイル(YAML、プロンプト、接続情報、�
 
 ## 手順6: 架空データで通しの確認をする
 
-実データの前に、架空データ(53件。うち2件は除外される想定。2026-11-08 時点)で、Python → Dify → 結果の作成までを通す。
+実データの前に、架空データ(58件。うち2件は除外される想定。2026-11-08 時点)で、Python → Dify → 結果の作成までを通す。
 
 ### 6-1. Dify を呼ばずに、送る内容だけを作る(dry-run)
 ```
 python repclass_cli.py run --input tests\fixtures\synthetic\repairs.csv --local-dir C:\work\repclass_local --dry-run
 ```
-> 確認: `dry-run: 入力 53 / 除外 2 / 送信予定 51 / バッチ 6` と、`注記を取り除いた修理: 6 件(マーク: U+25FE, U+2B50, U+203B, U+25A0, U+2605)` が表示されること(マークは初期値の場合)
+> 確認: `dry-run: 入力 58 / 除外 2 / 送信予定 56 / バッチ 7` と、`注記を取り除いた修理: 6 件(マーク: U+25FE, U+2B50, U+203B, U+25A0, U+2605)` が表示されること(マークは初期値の場合)
 
 ### 6-2. Dify の画面で1バッチだけ試す
 - `C:\work\repclass_local\outputs\<timestamp>\raw\batch_001_request.json` をメモ帳で開く。
@@ -190,7 +190,7 @@ python repclass_cli.py run --input tests\fixtures\synthetic\repairs.csv --local-
 ```
 python repclass_cli.py run --input tests\fixtures\synthetic\repairs.csv --local-dir C:\work\repclass_local
 ```
-> 確認: `入力 53 / 除外 2 / ok … / warning … / error 0` のように表示され、error が 0 件であること。
+> 確認: `入力 58 / 除外 2 / ok … / warning … / error 0` のように表示され、error が 0 件であること。
 - error がある場合は、表示されたエラーの種類を見て、`docs\dify\v2_workflow_setup.md` の第4節(トラブルシューティング)を確認する。
   - `api_error`: 接続設定の問題
   - `parse_error`: 出力が JSON になっていない

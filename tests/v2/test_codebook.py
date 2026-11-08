@@ -134,7 +134,7 @@ def test_r16_check_codebook_cli_ng(tmp_path, capsys):
 def test_r14_repository_default_codebook_is_valid():
     """リポジトリ同梱の初期値 YAML が v2 の自動チェックを通ること(R-14、R-16)。"""
     cb = load_codebook(REPO_ROOT / "config" / "classification_codes.yaml")
-    assert cb.version == "0.5.0"
+    assert cb.version == "0.5.1"
     assert set(cb.product_ids()) >= {"ML", "LENS"}
     assert cb.code_by_role("ML", "connected_device") == "M047"
 
@@ -167,6 +167,19 @@ def test_r31_product_capability_and_external_dirt_codes(pid, code, name):
     assert not cb.is_manufacturer(pid, code)
     assert info.record_type == "failure"
     assert info.role is None
+
+
+def test_r31_second_round_codes_and_descriptions():
+    """2026-11-08 第2弾(Q18〜Q21): LENS の動作不良 L042 と、説明文の書き分け。"""
+    cb = load_codebook(REPO_ROOT / "config" / "classification_codes.yaml")
+    l042 = cb.code("LENS", "L042")
+    assert l042.name == "動作不良" and l042.record_type == "failure" and cb.is_manufacturer("LENS", "L042")
+    assert "L042" in cb.code("LENS", "L006").description          # スイッチを操作していない表示の切り替わりは L042
+    assert "M047" in cb.code("ML", "M011").description and "M048" in cb.code("ML", "M011").description
+    assert "メモリーカード" in cb.code("ML", "M047").description
+    assert "AF-ON" in cb.code("ML", "M026").description and "ゴム" in cb.code("ML", "M026").description
+    assert "ゴム" in cb.code("DC", "D028").description
+    assert "M021" in cb.code("ML", "M001").description             # 電源SWの書き分け(既存)
 
 
 def test_r15_compact_camera_product():
