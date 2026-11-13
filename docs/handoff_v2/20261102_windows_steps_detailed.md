@@ -135,7 +135,7 @@ Windows 側で変更するファイル(YAML、プロンプト、接続情報、�
    ```
    python repclass_cli.py check --local-dir C:\work\repclass_local
    ```
-   > 確認: `OK: ... version=0.5.2 製品=ML(54), LENS(43), DC(53)` のように表示されること(2026-11-13 時点。バージョンとコード数は、YAML の更新で変わる)。
+   > 確認: `OK: ... version=0.5.3 製品=ML(54), LENS(43), DC(53)` のように表示されること(2026-11-14 時点。バージョンとコード数は、YAML の更新で変わる)。
 
 ---
 
