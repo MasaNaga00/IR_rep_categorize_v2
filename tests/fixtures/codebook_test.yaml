@@ -152,7 +152,7 @@ product_categories:
         role: other
       M047:
         name: 接続機器要因
-        description: 接続したレンズ・アクセサリー・メモリーカード等の側に原因があり、本体には異常がないと判断された修理データ。メモリーカード自体の不良を含む。カードの使い方が原因の場合はM048。
+        description: 接続したレンズ・アクセサリー・メモリーカード等の側に原因があり、本体には異常がないと判断された修理データ。メモリーカード自体の不良、他社製・互換品のバッテリー・充電器、USB充電に使う汎用の充電器・ケーブル・モバイルバッテリーを含む。カードの使い方が原因の場合はM048。純正の充電器・バッテリーはM051 / M052 / M053。
         record_type: failure
         responsibility: user_or_unknown
         role: connected_device
@@ -164,6 +164,21 @@ product_categories:
       M050:
         name: 外部の汚れ(清掃で解消)
         description: ディスプレイオフセンサー(アイセンサー)、電気接点(レンズ接点・端子など)など、外から簡単に触れられる部分の汚れが原因で現象が発生し、清掃・拭き取りだけで解消したもの。ユーザの使用中に付いた汚れとみなし、メーカー責任の範囲外とする。分解が必要な内部の汚れ、部品交換を行ったものは含めない。撮像センサー表面のゴミはM013、ファインダー表面のゴミはM015。
+        record_type: failure
+        responsibility: user_or_unknown
+      M051:
+        name: 充電器不良
+        description: 純正の充電器(バッテリーチャージャー、純正のUSB電源アダプター等)の不良で、バッテリーが充電できない等の現象が発生したもの。他社製・互換品の充電器や、USB充電に使う汎用の充電器・ケーブル・モバイルバッテリーが原因の場合はM047(接続機器要因)。本体側の充電・USB端子の不具合はM033。
+        record_type: failure
+        responsibility: manufacturer
+      M052:
+        name: バッテリー不良
+        description: 純正のバッテリーパックの不良(内部回路の不良、膨らみ、端子の破損等)で、電源が入らない・すぐ切れる等の現象が発生したもの。長期間の使用による劣化・寿命はM053。他社製・互換バッテリーが原因の場合はM047(接続機器要因)。
+        record_type: failure
+        responsibility: manufacturer
+      M053:
+        name: バッテリー劣化(寿命)
+        description: 純正のバッテリーパックの、長期間の使用による劣化・寿命(容量の低下、持ちが悪い等)が原因のもの。消耗品の劣化とみなし、メーカー責任の範囲外とする。バッテリー自体の不良はM052。
         record_type: failure
         responsibility: user_or_unknown
       M_UNK:
@@ -263,6 +278,11 @@ product_categories:
         description: 電源が入らない、起動しない等、電源系統全般の不具合。使用中にフリーズする・電源が切れるものは D003、電源ボタン自体の操作不良は D021、充電できないものは D002。
         record_type: failure
         responsibility: manufacturer
+      D002:
+        name: 充電不良
+        description: 本体やUSB経由でバッテリーが充電できない、充電が途中で止まる等の充電系統の不具合。USBの通信・接続の不具合は D040。充電器・バッテリー側の不良は、純正なら D051 / D052 / D053、他社製・汎用のUSB充電器なら D046。
+        record_type: failure
+        responsibility: manufacturer
       D005:
         name: 動作不良
         description: 特定の機能・操作が正常に動作しない包括的な分類。他の具体的な分類に該当しない動作異常。設定や操作が原因のものは D047。
@@ -295,7 +315,7 @@ product_categories:
         responsibility: user_or_unknown
       D046:
         name: 接続機器要因
-        description: 接続・使用したアクセサリー(充電器・メモリーカード・ケーブル・スマートフォン等)の側に原因があり、本体には異常がないと判断された修理データ。
+        description: 接続・使用したアクセサリー(他社製・互換品のバッテリー・充電器、USB充電に使う汎用の充電器・ケーブル・モバイルバッテリー、メモリーカード、スマートフォン等)の側に原因があり、本体には異常がないと判断された修理データ。純正の充電器・バッテリーはD051 / D052 / D053。
         record_type: failure
         responsibility: user_or_unknown
         role: connected_device
@@ -310,6 +330,11 @@ product_categories:
         description: 修理者が「製品実力の範囲内」「規格内」「仕様の範囲内」「製品仕様によるもの」など、カメラの実力・規格・仕様の範囲内と判断したもの。規格より厳しい基準での差異について、顧客対応として調整・部品交換を行った場合も含む。メーカー責任の範囲外とみなす。
         record_type: failure
         responsibility: user_or_unknown
+      D051:
+        name: 充電器不良
+        description: 純正の充電器(バッテリーチャージャー、純正のUSB電源アダプター等)の不良で、バッテリーが充電できない等の現象が発生したもの。他社製・互換品の充電器や、USB充電に使う汎用の充電器・ケーブル・モバイルバッテリーが原因の場合はD046(接続機器要因)。本体側の充電の不具合はD002。
+        record_type: failure
+        responsibility: manufacturer
       D_UNK:
         name: 判定不能
         description: 情報不足等で分類できない修理データ。コメントが極端に短い、内容が抽象的等の場合。

@@ -76,3 +76,9 @@ T056,1,M011,reproduced,direct,,M047,,
 T057,1,M026,reproduced,direct,,M026,,
 T058,1,M001,reproduced,direct,,M021,,まとめ書きでも、部位に対応するコードがあればそのコード(T004・T007 は対応するコードが無い部位なので、各番号のユーザ視点コード)
 T058,2,M021,reproduced,direct,,M021,,
+T059,1,M052,reproduced,direct,,M052,,ユーザがバッテリーそのものに触れているので、ユーザ視点もバッテリー不良
+T060,1,M052,reproduced,direct,,M053,,ユーザ視点はバッテリーの不具合(劣化か不良かはユーザには分からない)、修理者視点は劣化
+T061,1,M051,reproduced,direct,,M051,,
+T062,1,D002,reproduced,direct,,D046,,
+T063,1,D051,reproduced,direct,,D051,,
+T064,1,M001,reproduced,direct,,M047,,ユーザは現象だけを書いているので、ユーザ視点は電源不良

@@ -157,7 +157,7 @@ def test_r67_notes_are_not_sent_to_dify(tmp_path, codebook, synth_csv, fake_clie
     assert "\u203b" not in sent["T001"]["repair_comment"]   # 付随作業の ※ も取り除く
     assert sent["T002"]["repair_comment"] == read_csv(synth_csv)[1]["repair_comment"]   # マークの無いものはそのまま
     # 抜き出しが取り除く前の文にある場合も警告にしない
-    assert res.meta["counts"] == {"input": 58, "excluded": 2, "ok": 56, "warning": 0, "error": 0}
+    assert res.meta["counts"] == {"input": 64, "excluded": 2, "ok": 62, "warning": 0, "error": 0}
 
 
 def test_r67_repairs_csv_and_removed_notes_file(tmp_path, codebook, synth_csv, fake_client_factory, rules):

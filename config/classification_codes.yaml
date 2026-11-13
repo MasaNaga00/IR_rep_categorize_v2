@@ -8,7 +8,7 @@
 # =============================================================================
 
 meta:
-  version: "0.5.1"
+  version: "0.5.2"
   source: "故障分類.csv"
   created_at: "2026-04-29"
   total_codes:
@@ -22,6 +22,11 @@ meta:
     - 製品種別（ML/LENS）はSQL段階で判定済みの前提。
     - v0.2.0: ユーザ視点/修理者視点の2軸分類、reproduction_status属性を追加。
   changelog:
+    - version: "0.5.2"
+      date: "2026-11-13"
+      changes:
+        - "ML・DC に充電器不良 M051 / D051、バッテリー不良 M052 / D052(純正品の不良。メーカー責任)、バッテリー劣化(寿命) M053 / D053(ユーザ責任)を追加"
+        - "接続機器要因 M047 / D046 と DC の充電不良 D002 の説明文に、純正の充電器・バッテリーとの書き分けを追加(他社製・互換品、USB充電に使う汎用の充電器・ケーブル・モバイルバッテリーは接続機器要因のまま)"
     - version: "0.5.1"
       date: "2026-11-08"
       changes:
@@ -427,7 +432,7 @@ product_categories:
       # --- 接続機器要因 ---
       M047:
         name: "接続機器要因"
-        description: "接続したレンズ・アクセサリー・メモリーカード等の側に原因があり、本体には異常がないと判断された修理データ。メモリーカード自体の不良を含む。カードの使い方が原因の場合はM048。"
+        description: "接続したレンズ・アクセサリー・メモリーカード等の側に原因があり、本体には異常がないと判断された修理データ。メモリーカード自体の不良、他社製・互換品のバッテリー・充電器、USB充電に使う汎用の充電器・ケーブル・モバイルバッテリーを含む。カードの使い方が原因の場合はM048。純正の充電器・バッテリーはM051 / M052 / M053。"
         record_type: "failure"
         role: "connected_device"
         responsibility: "user_or_unknown"
@@ -456,6 +461,30 @@ product_categories:
         responsibility: "user_or_unknown"
         description_status: "ai_inferred"
         decision_rule: "外から触れる部分の汚れが原因で、清掃・拭き取りだけで解消したものはこのコード。内部の汚れ・部品交換は含めない"
+
+      M051:
+        name: "充電器不良"
+        description: "純正の充電器(バッテリーチャージャー、純正のUSB電源アダプター等)の不良で、バッテリーが充電できない等の現象が発生したもの。他社製・互換品の充電器や、USB充電に使う汎用の充電器・ケーブル・モバイルバッテリーが原因の場合はM047(接続機器要因)。本体側の充電・USB端子の不具合はM033。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+        decision_rule: "純正(他社製・互換・汎用USB充電器と書かれていないもの)の充電器・バッテリーが原因ならこのコード"
+
+      M052:
+        name: "バッテリー不良"
+        description: "純正のバッテリーパックの不良(内部回路の不良、膨らみ、端子の破損等)で、電源が入らない・すぐ切れる等の現象が発生したもの。長期間の使用による劣化・寿命はM053。他社製・互換バッテリーが原因の場合はM047(接続機器要因)。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+        decision_rule: "純正(他社製・互換・汎用USB充電器と書かれていないもの)の充電器・バッテリーが原因ならこのコード。劣化・寿命はM053"
+
+      M053:
+        name: "バッテリー劣化(寿命)"
+        description: "純正のバッテリーパックの、長期間の使用による劣化・寿命(容量の低下、持ちが悪い等)が原因のもの。消耗品の劣化とみなし、メーカー責任の範囲外とする。バッテリー自体の不良はM052。"
+        record_type: "failure"
+        responsibility: "user_or_unknown"
+        description_status: "ai_inferred"
+        decision_rule: "劣化・寿命・容量の低下・買い替えのお勧めが原因として書かれていればこのコード"
 
       # --- その他/特殊コード ---
       M046:
@@ -820,7 +849,7 @@ product_categories:
 
       D002:
         name: "充電不良"
-        description: "本体やUSB経由でバッテリーが充電できない、充電が途中で止まる等の充電系統の不具合。USBの通信・接続の不具合は D040。充電器側の不良は D046。"
+        description: "本体やUSB経由でバッテリーが充電できない、充電が途中で止まる等の充電系統の不具合。USBの通信・接続の不具合は D040。充電器・バッテリー側の不良は、純正なら D051 / D052 / D053、他社製・汎用のUSB充電器なら D046。"
         record_type: "failure"
         responsibility: "manufacturer"
         description_status: "ai_inferred"
@@ -1124,7 +1153,7 @@ product_categories:
 
       D046:
         name: "接続機器要因"
-        description: "接続・使用したアクセサリー(充電器・メモリーカード・ケーブル・スマートフォン等)の側に原因があり、本体には異常がないと判断された修理データ。"
+        description: "接続・使用したアクセサリー(他社製・互換品のバッテリー・充電器、USB充電に使う汎用の充電器・ケーブル・モバイルバッテリー、メモリーカード、スマートフォン等)の側に原因があり、本体には異常がないと判断された修理データ。純正の充電器・バッテリーはD051 / D052 / D053。"
         record_type: "failure"
         role: "connected_device"
         responsibility: "user_or_unknown"
@@ -1152,6 +1181,30 @@ product_categories:
         responsibility: "user_or_unknown"
         description_status: "ai_inferred"
         decision_rule: "外から触れる部分の汚れが原因で、清掃・拭き取りだけで解消したものはこのコード。内部の汚れ・部品交換は含めない"
+
+      D051:
+        name: "充電器不良"
+        description: "純正の充電器(バッテリーチャージャー、純正のUSB電源アダプター等)の不良で、バッテリーが充電できない等の現象が発生したもの。他社製・互換品の充電器や、USB充電に使う汎用の充電器・ケーブル・モバイルバッテリーが原因の場合はD046(接続機器要因)。本体側の充電の不具合はD002。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+        decision_rule: "純正(他社製・互換・汎用USB充電器と書かれていないもの)の充電器・バッテリーが原因ならこのコード"
+
+      D052:
+        name: "バッテリー不良"
+        description: "純正のバッテリーパックの不良(内部回路の不良、膨らみ、端子の破損等)で、電源が入らない・すぐ切れる等の現象が発生したもの。長期間の使用による劣化・寿命はD053。他社製・互換バッテリーが原因の場合はD046(接続機器要因)。"
+        record_type: "failure"
+        responsibility: "manufacturer"
+        description_status: "ai_inferred"
+        decision_rule: "純正(他社製・互換・汎用USB充電器と書かれていないもの)の充電器・バッテリーが原因ならこのコード。劣化・寿命はD053"
+
+      D053:
+        name: "バッテリー劣化(寿命)"
+        description: "純正のバッテリーパックの、長期間の使用による劣化・寿命(容量の低下、持ちが悪い等)が原因のもの。消耗品の劣化とみなし、メーカー責任の範囲外とする。バッテリー自体の不良はD052。"
+        record_type: "failure"
+        responsibility: "user_or_unknown"
+        description_status: "ai_inferred"
+        decision_rule: "劣化・寿命・容量の低下・買い替えのお勧めが原因として書かれていればこのコード"
 
       # --- その他/特殊コード ---
       D048:

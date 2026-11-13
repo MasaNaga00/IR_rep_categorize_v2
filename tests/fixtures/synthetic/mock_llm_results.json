@@ -1215,5 +1215,107 @@
   ],
   "environment": [],
   "extra_findings": []
+ },
+ "T059": {
+  "repair_id": "T059",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "付属のバッテリーを入れても電源が入らない。別のバッテリーでは入る。",
+    "user_code": "M052",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M052",
+    "repair_excerpt": "お預かりしたバッテリーパックの内部回路の不良により、ご指摘の現象が発生していたため、バッテリーパックを交換いたしました。カメラ本体には異常はございませんでした。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T060": {
+  "repair_id": "T060",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "バッテリーの持ちが悪くなった。",
+    "user_code": "M052",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M053",
+    "repair_excerpt": "お預かりしたバッテリーパックの劣化により、ご指摘の現象が発生していることを確認いたしました。長期間のご使用による容量の低下のため、お買い替えをお勧めいたします。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T061": {
+  "repair_id": "T061",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "充電器に入れてもランプが点滅して充電できない。",
+    "user_code": "M051",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M051",
+    "repair_excerpt": "お預かりしたバッテリーチャージャーの不良により、ご指摘の現象が発生していたため、バッテリーチャージャーを交換いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T062": {
+  "repair_id": "T062",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "USBケーブルで充電できない。",
+    "user_code": "D002",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "D046",
+    "repair_excerpt": "お客様ご使用の他社製USB充電器の出力不足により、ご指摘の現象が発生していることを確認いたしました。カメラ本体には異常はございませんでした。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T063": {
+  "repair_id": "T063",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "付属のUSB電源アダプターで充電できない。",
+    "user_code": "D051",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "D051",
+    "repair_excerpt": "お預かりしたUSB電源アダプター（純正）の不良により、ご指摘の現象が発生していたため、USB電源アダプターを交換いたしました。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
+ },
+ "T064": {
+  "repair_id": "T064",
+  "claims": [
+   {
+    "sub_id": 1,
+    "user_excerpt": "電源がすぐに切れてしまう。",
+    "user_code": "M001",
+    "reproduction": "reproduced",
+    "basis": "direct",
+    "ref_sub_id": null,
+    "repair_code": "M047",
+    "repair_excerpt": "お客様ご使用の互換バッテリーにより、ご指摘の現象が発生していることを確認いたしました。純正バッテリーでは異常はございませんでした。"
+   }
+  ],
+  "environment": [],
+  "extra_findings": []
  }
 }

@@ -134,7 +134,7 @@ def test_r16_check_codebook_cli_ng(tmp_path, capsys):
 def test_r14_repository_default_codebook_is_valid():
     """リポジトリ同梱の初期値 YAML が v2 の自動チェックを通ること(R-14、R-16)。"""
     cb = load_codebook(REPO_ROOT / "config" / "classification_codes.yaml")
-    assert cb.version == "0.5.1"
+    assert cb.version == "0.5.2"
     assert set(cb.product_ids()) >= {"ML", "LENS"}
     assert cb.code_by_role("ML", "connected_device") == "M047"
 
@@ -182,11 +182,26 @@ def test_r31_second_round_codes_and_descriptions():
     assert "M021" in cb.code("ML", "M001").description             # 電源SWの書き分け(既存)
 
 
+@pytest.mark.parametrize("pid, prefix, conn", [("ML", "M", "M047"), ("DC", "D", "D046")])
+def test_r31_charger_and_battery_codes(pid, prefix, conn):
+    """2026-11-13 追加(Q22〜Q25): 純正の充電器・バッテリーの不良はメーカー責任、劣化はユーザ責任。"""
+    cb = load_codebook(REPO_ROOT / "config" / "classification_codes.yaml")
+    names = {c: cb.code(pid, f"{prefix}{c}").name for c in ("051", "052", "053")}
+    assert names == {"051": "充電器不良", "052": "バッテリー不良", "053": "バッテリー劣化(寿命)"}
+    assert cb.is_manufacturer(pid, f"{prefix}051") and cb.is_manufacturer(pid, f"{prefix}052")
+    assert not cb.is_manufacturer(pid, f"{prefix}053")
+    assert all(cb.code(pid, f"{prefix}{c}").record_type == "failure" for c in ("051", "052", "053"))
+    assert "USB電源アダプター" in cb.code(pid, f"{prefix}051").description     # 純正の USB 電源アダプターは充電器不良
+    d = cb.code(pid, conn).description                                        # 他社製・汎用は接続機器要因のまま
+    assert "他社製" in d and f"{prefix}051" in d
+    assert cb.code("LENS", "L051") is None
+
+
 def test_r15_compact_camera_product():
     """2026-11-03 追加: 製品 DC(コンパクトカメラ、接頭文字 D)。"""
     cb = load_codebook(REPO_ROOT / "config" / "classification_codes.yaml")
     assert cb.product_name("DC") == "コンパクトカメラ"
-    assert len(cb.codes("DC")) == 50   # 2026-11-08: D049・D050 を追加
+    assert len(cb.codes("DC")) == 53   # 2026-11-08: D049・D050、2026-11-13: D051〜D053 を追加
     assert cb.code_by_role("DC", "connected_device") == "D046"
     assert cb.code_by_role("DC", "other") == "D048"
     assert cb.code_by_role("DC", "unknown") == "D_UNK"

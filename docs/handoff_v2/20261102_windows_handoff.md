@@ -69,7 +69,7 @@ pip install -r requirements-dev.txt
 ```
 python -m pytest tests/v2 -q
 ```
-- 期待: **208 passed**(2026-11-08 時点)。
+- 期待: **216 passed**(2026-11-13 時点)。
 - 失敗した場合は、失敗したテスト名(`test_r43_...` のように要件 ID が入っている)を第7節の書式で報告する。
 
 ### 2.4 ローカル作業フォルダの作成
@@ -93,7 +93,7 @@ python repclass_cli.py run --input tests\fixtures\synthetic\repairs.csv --local-
 python repclass_cli.py evaluate --gold tests\fixtures\synthetic\expected_claims.csv --run C:\work\repclass_local\outputs\<timestamp> --local-dir C:\work\repclass_local
 ```
 
-- 期待: 入力 58 / 除外 2 / error 0(2026-11-08 時点)。
+- 期待: 入力 64 / 除外 2 / error 0(2026-11-13 時点)。
 - `user_code`・`reproduction`・`repair_code` の一致率を確認する。
 - 不一致は `<実行フォルダ>\evaluation\mismatches.csv` にある。該当シナリオのねらいを `tests/fixtures/synthetic/README.md` で確認し、プロンプトを調整する。
 

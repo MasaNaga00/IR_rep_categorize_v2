@@ -51,7 +51,7 @@ def test_r60_sheets_and_headers(xlsx):
     assert ws.cell(r, _col("名称")).value == "電源不良"
     assert ws.cell(r, _col("責任区分")).value == "manufacturer"
     assert ws.cell(_row_of(ws, "M047"), _col("役割")).value == "connected_device"
-    assert ws.max_row - 1 == 51   # 2026-11-08: M049・M050 を追加
+    assert ws.max_row - 1 == 54   # 2026-11-08: M049・M050、2026-11-13: M051〜M053 を追加
     assert ws.data_validations.dataValidation   # ドロップダウンがある
 
 
